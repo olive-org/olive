@@ -1,0 +1,4 @@
+[toolchain]
+# targets = ["stable-aarch64-apple-darwin", "x86_64-unknown-linux-musl"]
+components = ["rustfmt", "clippy"]
+channel = "stable"
