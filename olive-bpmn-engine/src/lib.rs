@@ -1,14 +1,25 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+//! # olive-bpmn-engine
+//! ## Business Process Execution Engine
+//!
+//! [BPMN 2.0](http://omg.org/spec/BPMN/2.0) based business process execution engine. BPMN stands
+//! for **Business Process Model and Notation**. BPMN's goal is to help stakeholders to have a
+//! shared understanding of processes.
+//!
+//! olive-bpmn-engine focuses on the execution aspect of such notation, effectively allowing the processes
+//! described in BPMN to function as if they were programs. BPXE is not the only such engine, as
+//! there are many commercially or community supported ones. The motivation behind the creation of
+//! BPXE was to create an engine with a particular focus on type and memory safety, performance and
+//! multi-tenancy capabilities (ensuring that a great deal of processes should be able to operate
+//! even on a single server concurrently) and resistant to failures so that workflows can be
+//! resumed with little to no consideration when a failure happen.
+pub mod activity;
+pub mod bpmn;
+pub mod data_object;
+pub mod event;
+pub mod flow_node;
+pub mod language;
+pub mod model;
+pub mod process;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub(crate) mod serde;
+pub(crate) mod sys;
