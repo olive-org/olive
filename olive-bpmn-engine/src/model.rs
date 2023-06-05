@@ -79,7 +79,7 @@ where
 /// Control handle for a running model
 #[derive(Clone)]
 pub struct Handle {
-    definitons: Arc<Definitions>,
+    definitions: Arc<Definitions>,
     sender: mpsc::Sender<Request>,
     log_broadcast: broadcast::Sender<Log>,
     script_engine_factory: Arc<Box<dyn LanguageEngineFactory>>,
@@ -153,7 +153,7 @@ where
         let (log_broadcast, _) = broadcast::channel(128);
         let log_sender = log_broadcast.clone();
         let handle = Handle {
-            definitons: self.definitions.clone(),
+            definitions: self.definitions.clone(),
             sender: sender.clone(),
             log_broadcast,
             // these unwraps should be ok because we don't use `None` for `script_engine_factory`

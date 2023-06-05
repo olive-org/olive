@@ -13,6 +13,8 @@ use crate::bpmn::schema::{
     ParallelGateway, ScriptTask, SequenceFlow, StartEvent,
 };
 use crate::{activity, process};
+// use crate::event::{end_event, intermediate_catch_event, intermediate_throw_event, start_event};
+use crate::gateway;
 
 /// Flow node state
 ///
@@ -22,7 +24,18 @@ use crate::{activity, process};
 /// any associated types (which makes the final type be sized differently, and this makes it
 /// problematic for runtime dispatching.
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum State {}
+pub enum State {
+    // StartEvent(start_event::State),
+    // EndEvent(end_event::State),
+    // IntermediateThrowEvent(intermediate_throw_event::State),
+    // IntermediateCatchEvent(intermediate_catch_event::State),
+    // ParallelGateway(gateway::parallel::State),
+    // ExclusiveGateway(gateway::exclusive::State),
+    // InclusiveGateway(gateway::inclusive::State),
+    // EventBasedGateway(gateway::event_based::State),
+    // ScriptTask(activity::script_task::State),
+    ActivityState(activity::State),
+}
 
 /// State handling errors
 #[derive(Error, Debug)]

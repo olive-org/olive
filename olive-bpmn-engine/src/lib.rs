@@ -17,9 +17,13 @@ pub mod bpmn;
 pub mod data_object;
 pub mod event;
 pub mod flow_node;
+pub mod gateway;
 pub mod language;
 pub mod model;
 pub mod process;
+
+#[cfg(test)]
+pub mod test;
 
 pub(crate) mod serde;
 pub(crate) mod sys;
