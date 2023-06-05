@@ -171,40 +171,41 @@ impl Scheduler {
             flow_nodes,
             flow_nodes_outgoing,
             flow_nodes_incoming,
-            expression_evaluator: todo!(),
+            expression_evaluator,
             element,
             log_broadcast,
             data_objects,
         }
     }
 
+    // Main loop
     pub async fn run(mut self) {
         let mut join_handle = None;
         loop {
             task::yield_now().await;
             tokio::select! {
-                // Handle request procesing
-                next = self.receiver.recv() =>
-                 match next {
-                    Some(Request::JoinHandle(handle)) => join_handle = Some(handle),
-                    Some(Request::Terminate(sender)) => {
-                        let _ = sender.send(join_handle.take());
-                        return;
-                    }
-                    Some(Request::Start(sender)) => {
-                        self.start(sender);
-                    }
-                    Some(Request::DataObject(id, sender)) => {
-                        self.get_data_object(&id, sender);
-                    }
-                    None => {}
-                 },
-                // Flow node procesing
-                next = self.flow_nodes.next() => {
-                    if let Some(next) = next {
-                        self.process_flow_node_next(next).await;
-                    }
-                }
+               // Handle request processing
+               next = self.receiver.recv()  =>
+                   match next {
+                       Some(Request::JoinHandle(handle)) => join_handle = Some(handle),
+                       Some(Request::Terminate(sender)) => {
+                           let _ = sender.send(join_handle.take());
+                           return;
+                       }
+                       Some(Request::Start(sender)) => {
+                           self.start(sender);
+                       }
+                       Some(Request::DataObject(id, sender)) => {
+                           self.get_data_object(&id, sender);
+                       }
+                       None => {}
+                   },
+               // Flow node processing
+               next = self.flow_nodes.next() => {
+                   if let Some(next) = next {
+                           self.process_flow_node_next(next).await;
+                   }
+               }
             }
         }
     }
@@ -233,26 +234,32 @@ impl Scheduler {
         }
     }
 
-    /// Figure out what should be next course of action
+    /// Figure out what should be the next course of action
     fn next_action(&mut self, action: Option<flow_node::Action>, token: usize) -> Control {
         if let Some(flow_node) = self.flow_nodes.get(token) {
             flow_node.element().incomings().iter().fold(
                 Control::Proceed(action),
-                |control, incoming| match control {
-                    Control::Drop => control,
-                    Control::Proceed(action) => {
-                        let matching_predecessor = self.flow_nodes_outgoing.get(incoming);
-                        if let Some((previous_token, index)) = matching_predecessor {
-                            if let Some(incoming_node) = self.flow_nodes.get_mut(*previous_token) {
-                                match incoming_node.handle_outgoing_action(*index, action) {
-                                    None => Control::Drop,
-                                    Some(action) => Control::Proceed(action),
+                |control, incoming| {
+                    match control {
+                        // once the action has been dropped, it's not checked against
+                        // any other incoming flows
+                        Control::Drop => control,
+                        Control::Proceed(action) => {
+                            let matching_predecessor = self.flow_nodes_outgoing.get(incoming);
+                            if let Some((previous_token, index)) = matching_predecessor {
+                                if let Some(incoming_node) =
+                                    self.flow_nodes.get_mut(*previous_token)
+                                {
+                                    match incoming_node.handle_outgoing_action(*index, action) {
+                                        None => Control::Drop,
+                                        Some(action) => Control::Proceed(action),
+                                    }
+                                } else {
+                                    Control::Proceed(action)
                                 }
                             } else {
                                 Control::Proceed(action)
                             }
-                        } else {
-                            Control::Proceed(action)
                         }
                     }
                 },
@@ -263,7 +270,7 @@ impl Scheduler {
     }
 
     async fn process_flow_node_next(&mut self, (next, token): (StreamYield<FlowNode>, usize)) {
-        if self.flow_nodes.get(token).is_some() {
+        if self.flow_nodes.get(token).is_none() {
             // this shouldn't happen, but... (do nothing)
             // at least because of this check we can safely unwrap `flow_nodes.get*` below
             return;
@@ -271,7 +278,7 @@ impl Scheduler {
         if let StreamYield::Item(action) = next {
             let next_action = self.next_action(Some(action), token);
             match next_action {
-                // We're good to proceed with the follow probeing action
+                // We're good to proceed with the following probing action
                 Control::Proceed(Some(flow_node::Action::ProbeOutgoingSequenceFlows(indices))) => {
                     let outgoings = self
                         .flow_nodes
@@ -291,7 +298,7 @@ impl Scheduler {
                             self.flow_nodes
                                 .get_mut(token)
                                 .unwrap()
-                                .sequence_flow(index, &seq_flow, success)
+                                .sequence_flow(index, &seq_flow, success);
                         }
                     }
                 }
@@ -347,15 +354,16 @@ impl Scheduler {
                     if self.flow_nodes.is_empty() {
                         let _ = self.log_broadcast.send(Log::Done);
                     }
+                    Pin::new(&mut self.flow_nodes).remove(token);
                 }
-                // no action to be token
+                // no action to be taken
                 Control::Drop => {}
             }
         }
     }
 
     fn start(&mut self, sender: oneshot::Sender<Result<(), StartError>>) {
-        if self
+        if !self
             .process
             .element()
             .flow_elements()

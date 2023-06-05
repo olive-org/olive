@@ -58,7 +58,7 @@ impl FlowNode for EndEvent {
         Box::new(self.element.as_ref().clone())
     }
 
-    fn incoming(&mut self, index: IncomingIndex) {
+    fn incoming(&mut self, _index: IncomingIndex) {
         // Any incoming triggered is good enough to
         // complete EndEvent
         self.state = State::Complete;
@@ -74,13 +74,12 @@ impl FlowNode for EndEvent {
 
 impl From<Element> for EndEvent {
     fn from(element: Element) -> Self {
-        EndEvent::new(element)
+        Self::new(element)
     }
 }
 
 impl Stream for EndEvent {
     type Item = Action;
-
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         match self.state {
             State::Ready => {
@@ -88,9 +87,9 @@ impl Stream for EndEvent {
                 Poll::Pending
             }
             State::Complete => {
-                self.state = State::Complete;
-                if let Some(event_broadcast) = self.event_broadcaster.as_ref() {
-                    let _ = event_broadcast.send(ProcessEvent::End);
+                self.state = State::Done;
+                if let Some(event_broadcaster) = self.event_broadcaster.as_ref() {
+                    let _ = event_broadcaster.send(ProcessEvent::End);
                 }
                 Poll::Ready(Some(Action::Complete))
             }

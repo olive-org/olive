@@ -62,6 +62,7 @@ pub(crate) enum Request {
     ),
 }
 
+/// Process events
 #[derive(Clone, Debug, Serialize)]
 #[serde(tag = "type")]
 #[non_exhaustive]
@@ -129,7 +130,7 @@ impl Process {
 }
 
 impl Handle {
-    /// Requests and wait for model execution termination
+    /// Request and wait for model execution termination
     pub async fn terminate(self) {
         let (sender, receiver) = oneshot::channel();
         let _ = self.sender.send(Request::Terminate(sender)).await;
@@ -138,7 +139,7 @@ impl Handle {
         }
     }
 
-    /// Requests explicit process start
+    /// Request explicit process start
     pub async fn start(&self) -> Result<(), StartError> {
         let (sender, receiver) = oneshot::channel();
         let _ = self.sender.send(Request::Start(sender)).await;

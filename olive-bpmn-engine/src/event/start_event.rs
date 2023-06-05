@@ -57,7 +57,7 @@ pub enum State {
 }
 
 impl FlowNode for StartEvent {
-    fn set_state(&mut self, state: flow_node::State) -> Result<(), crate::flow_node::StateError> {
+    fn set_state(&mut self, state: flow_node::State) -> Result<(), flow_node::StateError> {
         match state {
             flow_node::State::StartEvent(state) => {
                 self.state = state;
@@ -75,7 +75,7 @@ impl FlowNode for StartEvent {
         Box::new(self.element.as_ref().clone())
     }
 
-    fn set_process(&mut self, process: process::Handle) {
+    fn set_process(&mut self, process: crate::process::Handle) {
         if let State::Initialized = self.state {
             self.state = State::Ready;
             if let Some(mut waker_receiver) = self.waker_receiver.take() {
@@ -86,7 +86,7 @@ impl FlowNode for StartEvent {
                         tokio::task::yield_now().await;
                         tokio::select! {
                             waker_ = waker_receiver.recv() => {
-                                waker = waker_
+                                waker = waker_;
                             }
                             _event = event_receiver.recv() => {
                                 // FIXME: should we only wake if it's a `Start` event
@@ -106,13 +106,12 @@ impl FlowNode for StartEvent {
 
 impl From<Element> for StartEvent {
     fn from(element: Element) -> Self {
-        StartEvent::new(element)
+        Self::new(element)
     }
 }
 
 impl Stream for StartEvent {
     type Item = Action;
-
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         match self.state {
             State::Initialized => Poll::Pending,
@@ -140,7 +139,7 @@ impl Stream for StartEvent {
                     Some(Control::Ready) => {
                         self.state = State::Complete;
                         Poll::Ready(Some(Action::Flow(
-                            (0..self.element.outgoings.len()).collect(),
+                            (0..self.element.outgoings().len()).collect(),
                         )))
                     }
                     Some(Control::Done) => Poll::Ready(None),
@@ -151,7 +150,7 @@ impl Stream for StartEvent {
                 }
             }
             State::Complete => {
-                self.state = State::Complete;
+                self.state = State::Done;
                 Poll::Ready(Some(Action::Complete))
             }
             State::Done => {

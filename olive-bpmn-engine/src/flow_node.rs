@@ -12,9 +12,9 @@ use crate::bpmn::schema::{
     FlowNodeType, InclusiveGateway, IntermediateCatchEvent, IntermediateThrowEvent,
     ParallelGateway, ScriptTask, SequenceFlow, StartEvent,
 };
-use crate::{activity, process};
 use crate::event::{end_event, intermediate_catch_event, intermediate_throw_event, start_event};
 use crate::gateway;
+use crate::{activity, process};
 
 /// Flow node state
 ///
@@ -161,6 +161,16 @@ pub trait FlowNode: Stream<Item = Action> + Send + Unpin {
 pub(crate) fn new(element: Box<dyn DocumentElement>) -> Option<Box<dyn FlowNode>> {
     let e = element.element();
     match e {
+        Element::StartEvent => make::<StartEvent, start_event::StartEvent>(element),
+        Element::EndEvent => make::<EndEvent, end_event::EndEvent>(element),
+        Element::IntermediateThrowEvent => make::<
+            IntermediateThrowEvent,
+            intermediate_throw_event::IntermediateThrowEvent,
+        >(element),
+        Element::IntermediateCatchEvent => make::<
+            IntermediateCatchEvent,
+            intermediate_catch_event::IntermediateCatchEvent,
+        >(element),
         _ => None,
     }
 }
