@@ -62,7 +62,11 @@ fn normalize(string: &str) -> Result<String, NormalizationError> {
                 match ns {
                     None => {}
                     Some(BPMN_NS) => {
-                        update_prefix(e);
+                        match e.preferred_prefix() {
+                            None => update_prefix(e),
+                            _ => ()
+                        };
+                        
                         let mut output = Vec::new();
                         sxd::writer::format_document(&doc, &mut output)
                             .map_err(|err| NormalizationError::WritingError { error: err })?;

@@ -17,7 +17,6 @@ use crate::language::{
 use crate::process::Log;
 use crate::sys::task;
 
-
 /// Script Task flow node
 pub struct Task {
     element: Arc<Element>,

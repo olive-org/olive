@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1ohnh3g" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1ohnh3g" targetNamespace="http://bpmn.io/schema/bpmn" xmlns:olive="http://olive.org/schema/olive/1.0" exporter="Camunda Modeler" exporterVersion="4.4.0">
   <bpmn:process id="proc1" isExecutable="true">
+      <bpmn:extensionElements>
+        <olive:taskDefinition type="service"/>
+        <olive:properties>
+          <olive:item key="worker" value="1"/>
+          <olive:item key="stepName" value="a"/>
+        </olive:properties>
+        <olive:taskHeaders>
+          <olive:item key="worker" value="1"/>
+          <olive:item key="stepName" value="a"/>
+        </olive:taskHeaders>
+      </bpmn:extensionElements>
     <bpmn:startEvent id="start">
       <bpmn:outgoing>Flow_1cta1at</bpmn:outgoing>
     </bpmn:startEvent>
