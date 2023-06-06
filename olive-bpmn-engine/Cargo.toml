@@ -29,7 +29,7 @@ tokio = { version = "1.28.0", features = ["macros", "rt-multi-thread", "time", "
 futures = "0.3.12"
 serde = { version = "1.0.119", features = ["derive"] }
 smallvec = { version = "1.6.1", features = ["serde"] }
-rhai = { version = "1.14.0", features = ["sync", "serde"], optional = true }
+rhai = { version = "1.14.0", features = ["sync", "serde"], optional = true}
 async-trait = "0.1"
 factory = "0.1.2"
 num-bigint = { version = "0.3.1", features = ["serde"] }
@@ -47,3 +47,6 @@ toml = "0.5"
 ron = "0.6"
 rmp-serde = "0.15"
 pin-project = "1"
+
+[features]
+default = ["rhai"]

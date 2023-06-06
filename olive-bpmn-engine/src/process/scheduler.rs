@@ -1,6 +1,16 @@
 //! Process Scheduler
 //!
 //! This is where the magic happens
+use derive_more::{Deref, DerefMut};
+use futures::stream::{Stream, StreamExt};
+use streamunordered::{StreamUnordered, StreamYield};
+use tokio::sync::{broadcast, mpsc, oneshot, RwLock};
+
+use std::collections::HashMap;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context, Poll};
+
 use super::{DataObjectContainer, DataObjectError, Handle, Log, Request, StartError};
 use crate::bpmn::schema::{
     self, DocumentElementContainer, Element as E, Expr, FormalExpression, Process, ProcessType,
@@ -11,14 +21,6 @@ use crate::event::ProcessEvent as Event;
 use crate::flow_node;
 use crate::language::{Engine as _, EngineContextProvider, MultiLanguageEngine};
 use crate::sys::task;
-use derive_more::{Deref, DerefMut};
-use futures::stream::{Stream, StreamExt};
-use std::collections::HashMap;
-use std::pin::Pin;
-use std::sync::Arc;
-use std::task::{Context, Poll};
-use streamunordered::{StreamUnordered, StreamYield};
-use tokio::sync::{broadcast, mpsc, oneshot, RwLock};
 
 pub(crate) struct Scheduler {
     receiver: mpsc::Receiver<Request>,
@@ -184,27 +186,27 @@ impl Scheduler {
         loop {
             task::yield_now().await;
             tokio::select! {
-               // Handle request processing
-               next = self.receiver.recv()  =>
-                   match next {
-                       Some(Request::JoinHandle(handle)) => join_handle = Some(handle),
-                       Some(Request::Terminate(sender)) => {
-                           let _ = sender.send(join_handle.take());
-                           return;
-                       }
-                       Some(Request::Start(sender)) => {
-                           self.start(sender);
-                       }
-                       Some(Request::DataObject(id, sender)) => {
-                           self.get_data_object(&id, sender);
-                       }
-                       None => {}
-                   },
-               // Flow node processing
-               next = self.flow_nodes.next() => {
-                   if let Some(next) = next {
-                           self.process_flow_node_next(next).await;
-                   }
+                // Handle request processing
+                next = self.receiver.recv() =>
+                    match next {
+                        Some(Request::JoinHandle(handle)) => join_handle = Some(handle),
+                        Some(Request::Terminate(sender)) => {
+                            let _ = sender.send(join_handle.take());
+                            return;
+                        }
+                        Some(Request::Start(sender)) => {
+                            self.start(sender);
+                        }
+                        Some(Request::DataObject(id, sender)) => {
+                            self.get_data_object(&id, sender);
+                        }
+                        None => {}
+                    },
+                // Flow node processing
+                next = self.flow_nodes.next() => {
+                    if let Some(next) = next {
+                        self.process_flow_node_next(next).await;
+                    }
                }
             }
         }

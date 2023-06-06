@@ -356,7 +356,23 @@
                         </xsl:when>
                         <xsl:otherwise>
                                 <xsl:text>#[derive(Tia, Hash, Default, Clone, XmlRead, PartialEq, Debug, Serialize, Deserialize)]</xsl:text>
-                                <xsl:text>#[xml(tag = "bpmn:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                <xsl:choose>
+                                    <xsl:when test="local:struct-case($typeName) = 'TaskDefinition'">
+                                        <xsl:text>#[xml(tag = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="local:struct-case($typeName) = 'TaskHeaders'">
+                                        <xsl:text>#[xml(tag = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="local:struct-case($typeName) = 'Properties'">
+                                        <xsl:text>#[xml(tag = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="local:struct-case($typeName) = 'Item'">
+                                        <xsl:text>#[xml(tag = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>#[xml(tag = "bpmn:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                         </xsl:otherwise>
                 </xsl:choose>
                 <xsl:text xml:space="preserve">pub struct </xsl:text>
@@ -575,11 +591,35 @@
                     <xsl:text>#[xml(</xsl:text>
                     <xsl:for-each select="$schema/xs:element[@substitutionGroup = $name]">
                         <xsl:text>child = "bpmn:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
+                        <xsl:choose>
+                            <xsl:when test="$name = 'taskDefinition'">
+                                <xsl:text>child = "olive:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>child = "bpmn:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:for-each>
                     <xsl:text>)]</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "bpmn:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                        <xsl:choose>
+                            <xsl:when test="$name = 'taskDefinition'">
+                                <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="$name = 'taskHeaders'">
+                                <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="$name = 'properties'">
+                                <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="$name = 'item'">
+                                <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "bpmn:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:text>#[tia("</xsl:text><xsl:value-of select="local:struct-case($type/@name)"/><xsl:text>Type",rg*="</xsl:text><xsl:value-of select="local:elementUnderscoreName(.)"/>

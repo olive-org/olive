@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use serde::Serialize;
 use thiserror::Error;
-use tokio::sync::{broadcast, mpsc, RwLock, oneshot};
+use tokio::sync::{broadcast, mpsc, oneshot, RwLock};
 use tokio::task::{self, JoinHandle};
 
 use crate::bpmn::schema::{FlowNodeType, Process as Element};
@@ -353,7 +353,7 @@ mod tests {
                     } = e
                     {
                         matches!(node.downcast_ref::<EndEvent>(),
-                    Some(end_event) if end_event.id().as_ref().unwrap() == "end")
+                        Some(end_event) if end_event.id().as_ref().unwrap() == "end")
                     } else {
                         false
                     }

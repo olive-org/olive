@@ -29,11 +29,11 @@ pub enum State {
     EndEvent(end_event::State),
     IntermediateThrowEvent(intermediate_throw_event::State),
     IntermediateCatchEvent(intermediate_catch_event::State),
-    // ParallelGateway(gateway::parallel::State),
-    // ExclusiveGateway(gateway::exclusive::State),
-    // InclusiveGateway(gateway::inclusive::State),
-    // EventBasedGateway(gateway::event_based::State),
-    // ScriptTask(activity::script_task::State),
+    ParallelGateway(gateway::parallel::State),
+    ExclusiveGateway(gateway::exclusive::State),
+    InclusiveGateway(gateway::inclusive::State),
+    EventBasedGateway(gateway::event_based::State),
+    ScriptTask(activity::script_task::State),
     ActivityState(activity::State),
 }
 
@@ -171,6 +171,13 @@ pub(crate) fn new(element: Box<dyn DocumentElement>) -> Option<Box<dyn FlowNode>
             IntermediateCatchEvent,
             intermediate_catch_event::IntermediateCatchEvent,
         >(element),
+        Element::ParallelGateway => make::<ParallelGateway, gateway::parallel::Gateway>(element),
+        Element::ExclusiveGateway => make::<ExclusiveGateway, gateway::exclusive::Gateway>(element),
+        Element::InclusiveGateway => make::<InclusiveGateway, gateway::inclusive::Gateway>(element),
+        Element::EventBasedGateway => {
+            make::<EventBasedGateway, gateway::event_based::Gateway>(element)
+        }
+        Element::ScriptTask => make_activity::<ScriptTask, activity::script_task::Task>(element),
         _ => None,
     }
 }
