@@ -21,6 +21,7 @@ pub mod gateway;
 pub mod language;
 pub mod model;
 pub mod process;
+pub mod context;
 
 #[cfg(test)]
 pub mod test;

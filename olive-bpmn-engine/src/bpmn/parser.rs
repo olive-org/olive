@@ -31,6 +31,7 @@ pub enum NormalizationError {
 }
 
 const BPMN_NS: &str = "http://www.omg.org/spec/BPMN/20100524/MODEL";
+const OLIVE_NS: &str = "http://olive.org/schema/olive/1.0";
 
 // This function uses a different XML package (sxd-document) for processing XML
 // documents. Hopefully there's no need for this package elsewhere.
@@ -72,6 +73,7 @@ fn normalize(string: &str) -> Result<String, NormalizationError> {
                             .map_err(|err| NormalizationError::WritingError { error: err })?;
                         return Ok(String::from_utf8_lossy(&output).into_owned());
                     }
+                    Some(OLIVE_NS) => {}
                     Some(_) => {}
                 }
             }

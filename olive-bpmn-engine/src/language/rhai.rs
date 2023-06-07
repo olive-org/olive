@@ -7,7 +7,8 @@ use crate::data_object::{self, DataObject};
 use crate::sys::task;
 use async_trait::async_trait;
 use num_bigint::BigInt;
-use rhai::Dynamic;
+use rhai::{Dynamic, ImmutableString};
+use serde::Serialize;
 use std::any::{Any, TypeId};
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
@@ -111,6 +112,10 @@ impl Rhai {
         if let Some(data_object::Container(v)) = value.downcast_ref::<data_object::Container<u8>>()
         {
             Ok(Dynamic::from(*v))
+        } else if let Some(data_object::Container(v)) =
+            value.downcast_ref::<data_object::Container<ImmutableString>>()
+        {
+            Ok(Dynamic::from(v.clone()))
         } else if let Some(data_object::Container(v)) =
             value.downcast_ref::<data_object::Container<i8>>()
         {
@@ -253,6 +258,36 @@ impl EngineContext for Context {
     }
 }
 
+impl Context {
+    pub fn push(&mut self, name: &str, value: &dyn Any) -> &mut Self {
+        if let Some(v) = value.downcast_ref::<String>() {
+            self.set(
+                name,
+                Box::new(data_object::Container(ImmutableString::from(v.clone()))),
+            );
+        }
+        if let Some(v) = value.downcast_ref::<i64>() {
+            self.set(name, Box::new(data_object::Container(*v)));
+        }
+        if let Some(v) = value.downcast_ref::<i32>() {
+            self.set(name, Box::new(data_object::Container(*v as i64)));
+        }
+        if let Some(v) = value.downcast_ref::<usize>() {
+            self.set(name, Box::new(data_object::Container(*v as i64)));
+        }
+        if let Some(v) = value.downcast_ref::<f32>() {
+            self.set(name, Box::new(data_object::Container(*v as f64)));
+        }
+        if let Some(v) = value.downcast_ref::<f64>() {
+            self.set(name, Box::new(data_object::Container(*v)));
+        }
+        if let Some(v) = value.downcast_ref::<serde_json::Value>() {
+            self.set(name, Box::new(v.clone()));
+        }
+        self
+    }
+}
+
 impl EngineContextProvider for Rhai {
     type Context = Context;
 
@@ -314,7 +349,7 @@ impl Engine<ScriptTask> for Rhai {
 mod tests {
     use super::*;
     use crate::language::*;
-    use ::rhai::Dynamic;
+    use ::rhai::{Dynamic, Scope};
     use olive_internal_macros as olive_im;
 
     #[olive_im::test]
@@ -399,6 +434,18 @@ mod tests {
     }
 
     #[olive_im::test]
+    async fn rhai_custom_variable() {
+        let e = Rhai::new();
+        let mut ctx = e.new_context();
+        ctx.set("name", Box::new(data_object::Container(1)));
+        let mut scope = Scope::new();
+        scope.push("name", 1i64);
+        assert!(e
+            .eval_expression_with_scope::<bool>(&mut scope, "name == 1")
+            .unwrap());
+    }
+
+    #[olive_im::test]
     async fn rhai_usize_support() {
         let e = Rhai::new();
         assert_eq!(
@@ -432,6 +479,36 @@ mod tests {
             .unwrap(),
             100
         );
+    }
+
+    #[olive_im::test]
+    async fn rhai_bool_support_expr() {
+        let e = Rhai::new();
+        let mut ctx = e.new_context();
+        ctx.push("a", &"a".to_string());
+        ctx.push("b", &2);
+        let result = e
+            .eval::<bool>(
+                &FormalExpression {
+                    content: Some(r#"a.unveil() == "a""#.into()),
+                    ..Default::default()
+                },
+                &mut ctx,
+            )
+            .await
+            .unwrap();
+        assert!(result);
+
+        assert!(e
+            .eval::<bool>(
+                &FormalExpression {
+                    content: Some("b.unveil() > 1".into()),
+                    ..Default::default()
+                },
+                &mut ctx,
+            )
+            .await
+            .unwrap())
     }
 
     #[olive_im::test]

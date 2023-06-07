@@ -218,9 +218,10 @@ impl Scheduler {
         ))) = seq_flow.condition_expression
         {
             let expr = expr.clone();
+            let mut ctx = self.expression_evaluator.new_context();
             match self
                 .expression_evaluator
-                .eval::<bool>(&expr, &mut self.expression_evaluator.new_context())
+                .eval::<bool>(&expr, &mut ctx)
                 .await
             {
                 Ok(result) => result,
@@ -280,6 +281,12 @@ impl Scheduler {
         if let StreamYield::Item(action) = next {
             let next_action = self.next_action(Some(action), token);
             match next_action {
+                // We're good to proceed with the following execute action
+                // Control::Proceed(Some(flow_node::Action::Execute(_))) => {
+                //     let el = self.flow_nodes.get(token).unwrap().element();
+                //     let _ = el.extension_elements();
+                    
+                // }
                 // We're good to proceed with the following probing action
                 Control::Proceed(Some(flow_node::Action::ProbeOutgoingSequenceFlows(indices))) => {
                     let outgoings = self

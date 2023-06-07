@@ -748,6 +748,7 @@
 		</xsd:sequence>
 		<xsd:attribute name="key" type="xsd:string"/>
 		<xsd:attribute name="value" type="xsd:string"/>
+		<xsd:attribute name="type" type="xsd:string"/>
 	</xsd:complexType>
 
 	<xsd:element name="flowElement" type="tFlowElement"/>

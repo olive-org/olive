@@ -14,7 +14,7 @@ use crate::flow_node::{self, Action, FlowNode};
 use crate::language::{
     Engine as _, EngineContext, EngineContextProvider, EvaluationError, MultiLanguageEngine,
 };
-use crate::process::Log;
+use crate::process::{self, Log};
 use crate::sys::task;
 
 /// Script Task flow node
@@ -90,7 +90,7 @@ impl FlowNode for Task {
         Box::new(self.element.as_ref().clone())
     }
 
-    fn set_process(&mut self, process: crate::process::Handle) {
+    fn set_process(&mut self, process: process::Handle) {
         if let State::Initialized = self.state {
             self.state = State::Ready;
             self.log_broadcast.replace(process.log_broadcast());

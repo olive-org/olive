@@ -242,7 +242,6 @@ impl Default for MultiLanguageEngine {
 }
 
 #[cfg(test)]
-#[cfg(feature = "rhai")]
 mod tests {
     use super::*;
     use olive_internal_macros as olive_im;

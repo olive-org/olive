@@ -52,6 +52,13 @@ pub enum DataObjectError {
     NotReceived,
 }
 
+/// Service Task Execute Error
+#[derive(Error, Debug, PartialEq)]
+pub enum ExecuteError {
+    #[error("request timeout")]
+    Timeout,
+}
+
 pub(crate) enum Request {
     JoinHandle(JoinHandle<()>),
     Terminate(oneshot::Sender<Option<JoinHandle<()>>>),
@@ -64,7 +71,7 @@ pub(crate) enum Request {
 
 /// Process events
 #[derive(Clone, Debug, Serialize)]
-#[serde(tag = "type")]
+#[serde(tag = "log")]
 #[non_exhaustive]
 pub enum Log {
     /// Flow node has received an incoming flow (activated for each incoming flow)
@@ -73,6 +80,13 @@ pub enum Log {
         node: Box<dyn FlowNodeType>,
         incoming_index: flow_node::IncomingIndex,
     },
+    /// Flow node execution beeing executing
+    // FlowNodeExecuting {
+    //     #[serde(serialize_with = "crate::serde::serialize_flow_node")]
+    //     node: Box<dyn FlowNodeType>,
+    //     #[serde(skip_serializing)]
+    //     sender: mpsc::Sender<Result<(), ExecuteError>>  
+    // },
     /// Flow node execution has been completed
     FlowNodeCompleted {
         #[serde(serialize_with = "crate::serde::serialize_flow_node")]

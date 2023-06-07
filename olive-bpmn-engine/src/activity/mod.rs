@@ -32,7 +32,7 @@ pub trait Activity: FlowNode {
     /// Signals execution request
     fn execute(&mut self);
 
-    /// Reports input sets
+    /// sets input sets
     ///
     /// Default implementation does nothing
     #[allow(unused_variables)]

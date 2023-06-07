@@ -6,6 +6,7 @@ use futures::Stream;
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 use thiserror::Error;
+use tokio::sync::mpsc;
 
 use crate::bpmn::schema::{
     ActivityType, DocumentElement, Element, EndEvent, EventBasedGateway, ExclusiveGateway,
@@ -14,6 +15,7 @@ use crate::bpmn::schema::{
 };
 use crate::event::{end_event, intermediate_catch_event, intermediate_throw_event, start_event};
 use crate::gateway;
+use crate::process::ExecuteError;
 use crate::{activity, process};
 
 /// Flow node state
@@ -22,7 +24,7 @@ use crate::{activity, process};
 ///
 /// All flow nodes' state is combined into one "big" enum so that [`FlowNode`] doesn't need to have
 /// any associated types (which makes the final type be sized differently, and this makes it
-/// problematic for runtime dispatching.
+/// problematic for runtime dispatching.)
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum State {
     StartEvent(start_event::State),
@@ -67,6 +69,8 @@ pub const SMALL_OUTGOING: usize = 8;
 /// Determination of next action by flow nodes
 #[derive(Debug)]
 pub enum Action {
+    /// Service Task Execute
+    // Execute(mpsc::Sender<Result<(), ExecuteError>>),
     /// Check whether given outgoings will flow
     ///
     /// This is useful if the flow node needs to know whether certain outgoings
