@@ -171,7 +171,7 @@ mod tests {
         // End event should be reached
         assert!(
             log_mailbox
-                .receive(|e| if let Log::FlowNodeCompleted { node } = e {
+                .receive(|e| if let Log::FlowNodeCompleted { node, .. } = e {
                     matches!(node.downcast_ref::<EndEvent>(),
                 Some(end_event) if end_event.id().as_ref().unwrap() == "end")
                 } else {

@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0xpqpja" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0xpqpja" xmlns:olive="http://bpmn.io/schema/bpmn" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
   <bpmn:process id="proc1" isExecutable="true">
     <bpmn:startEvent id="start">
       <bpmn:outgoing>Flow_00jzs7a</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_00jzs7a" sourceRef="start" targetRef="script" />
-    <bpmn:scriptTask id="script">
+    <bpmn:sequenceFlow id="Flow_00jzs7a" sourceRef="start" targetRef="service" />
+    <bpmn:serviceTask id="service">
       <bpmn:incoming>Flow_00jzs7a</bpmn:incoming>
       <bpmn:outgoing>Flow_0yfenlf</bpmn:outgoing>
-      <bpmn:script>1;</bpmn:script>
-    </bpmn:scriptTask>
+      <bpmn:extensionElements>
+        <olive:taskDefinition type="service"/>
+        <olive:taskHeaders>
+          <olive:item key="contentType" value="aplication/json" type="string"/>
+        </olive:taskHeaders>
+        <olive:properties>
+          <olive:item key="a" value="1" type="integer"/>
+          <olive:item key="b" value="{&#34;a&#34;: &#34;b&#34;}" type="object"/>
+        </olive:properties>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
     <bpmn:endEvent id="end">
       <bpmn:incoming>Flow_0yfenlf</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0yfenlf" sourceRef="script" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_0yfenlf" sourceRef="service" targetRef="end" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc1">

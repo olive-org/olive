@@ -3,10 +3,10 @@ use std::marker::PhantomData;
 
 use factory::ParameterizedFactory;
 use futures::Stream;
+use olive_bpmn_schema::ServiceTask;
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 use thiserror::Error;
-use tokio::sync::mpsc;
 
 use crate::bpmn::schema::{
     ActivityType, DocumentElement, Element, EndEvent, EventBasedGateway, ExclusiveGateway,
@@ -14,9 +14,8 @@ use crate::bpmn::schema::{
     ParallelGateway, ScriptTask, SequenceFlow, StartEvent,
 };
 use crate::event::{end_event, intermediate_catch_event, intermediate_throw_event, start_event};
-use crate::gateway;
-use crate::process::ExecuteError;
 use crate::{activity, process};
+use crate::{context, gateway};
 
 /// Flow node state
 ///
@@ -36,6 +35,7 @@ pub enum State {
     InclusiveGateway(gateway::inclusive::State),
     EventBasedGateway(gateway::event_based::State),
     ScriptTask(activity::script_task::State),
+    ServiceTask(activity::service_task::State),
     ActivityState(activity::State),
 }
 
@@ -69,8 +69,6 @@ pub const SMALL_OUTGOING: usize = 8;
 /// Determination of next action by flow nodes
 #[derive(Debug)]
 pub enum Action {
-    /// Service Task Execute
-    // Execute(mpsc::Sender<Result<(), ExecuteError>>),
     /// Check whether given outgoings will flow
     ///
     /// This is useful if the flow node needs to know whether certain outgoings
@@ -98,6 +96,16 @@ pub trait FlowNode: Stream<Item = Action> + Send + Unpin {
     /// The reason why it's mutable is that in some cases some activites might want to change their
     /// data or simply get mutable access to it during state retrieval
     fn get_state(&mut self) -> State;
+
+    // Gets flow node Context
+    #[allow(unused_variables)]
+    fn get_context(&self) -> Option<&context::Context> {
+        None
+    }
+
+    // Sets flow node Context
+    #[allow(unused_variables)]
+    fn set_context(&mut self, _ctx: &context::Context) {}
 
     /// Sets process handle
     ///
@@ -182,6 +190,7 @@ pub(crate) fn new(element: Box<dyn DocumentElement>) -> Option<Box<dyn FlowNode>
             make::<EventBasedGateway, gateway::event_based::Gateway>(element)
         }
         Element::ScriptTask => make_activity::<ScriptTask, activity::script_task::Task>(element),
+        Element::ServiceTask => make_activity::<ServiceTask, activity::service_task::Task>(element),
         _ => None,
     }
 }

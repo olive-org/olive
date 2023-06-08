@@ -58,6 +58,51 @@ impl Context {
     pub fn set_properties(&mut self, name: &str, value: &Value) {
         self.properties.insert(name.to_string(), value.clone());
     }
+
+    pub fn bond(&mut self, other: &Self) {
+        for (k, v) in &mut self.headers {
+            let result = match v {
+                Value::String(x) if x.is_empty() => other.get_header(k.as_str()),
+                Value::Object(x) if x.is_empty() => other.get_header(k.as_str()),
+                _ => None,
+            };
+
+            if let Some(value) = result {
+                *v = value.clone()
+            }
+        }
+        for (k, v) in &mut self.properties {
+            let result = match v {
+                Value::String(x) if x.is_empty() => other.get_properties(k.as_str()),
+                Value::Object(x) if x.is_empty() => other.get_properties(k.as_str()),
+                _ => None,
+            };
+
+            if let Some(value) = result {
+                *v = value.clone()
+            }
+        }
+    }
+
+    pub fn merge(&mut self, other: &Self) {
+        if self.service_type.is_none() {
+            self.service_type = other.service_type.clone();
+        }
+        for (k, v) in &other.headers {
+            match self.get_header_mut(k.as_str()) {
+                None => self.set_header(k, v),
+                Some(Value::Null) => self.set_header(k, v),
+                _ => {}
+            }
+        }
+        for (k, v) in &other.properties {
+            match self.get_properties_mut(k.as_str()) {
+                None => self.set_properties(k, v),
+                Some(Value::Null) => self.set_properties(k, v),
+                _ => {}
+            }
+        }
+    }
 }
 
 impl From<ExtensionElements> for Context {
@@ -146,6 +191,11 @@ pub fn parse_item(item: &Item) -> Option<(String, Value)> {
                         serde_value = json!(ok);
                     }
                 }
+                "object" => {
+                    if let Ok(v) = serde_json::from_str::<serde_json::Map<String, Value>>(&html_escape::decode_html_entities(value)) {
+                        serde_value = Value::Object(v)
+                    }
+                }
                 _ => serde_value = Value::String(value.to_string()),
             }
         }
@@ -161,6 +211,7 @@ pub fn parse_context_item((name, value): (&String, &Value)) -> Item {
             Some(_) => "float",
             None => "integer",
         },
+        Value::Object(_) => "object",
         _ => "string",
     };
     Item {
@@ -191,5 +242,39 @@ mod test {
         ctx.set_service_type(Some("service".to_string()));
         let el = ExtensionElements::from(ctx.into());
         assert_eq!(el.task_definition.unwrap().typ, Some("service".to_string()));
+    }
+
+    #[test]
+    fn merge_context() {
+        let mut c1 = Context::new();
+        let mut c2 = Context::new();
+
+        c1.set_service_type(Some("service".to_string()));
+        c1.set_header("a", &json!("a".to_string()));
+        c2.set_properties("version", &json!(1));
+
+        c2.merge(&c1);
+        assert_eq!(c2.get_service_type(), Some(&"service".to_string()));
+        assert_eq!(c2.get_header("a"), Some(&json!("a".to_string())));
+        assert_eq!(c2.get_properties("version"), Some(&json!(1)));
+    }
+
+    #[test]
+    fn bound_context() {
+        let mut c1 = Context::new();
+        let mut c2 = Context::new();
+
+        c1.set_header("a", &json!("".to_string()));
+        c2.set_header("a", &json!("a".to_string()));
+        c1.bond(&c2);
+
+        assert_eq!(c1.get_header("a"), Some(&json!("a".to_string())));
+    }
+
+    #[test]
+    fn escape_test() {
+        let s = r#"{&#34;a&#34;: &#34;b&#34;}"#;
+        let ss = html_escape::decode_html_entities(s);
+        println!("{:?}", ss)
     }
 }

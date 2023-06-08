@@ -219,8 +219,11 @@ mod tests {
     use crate::language::*;
     use crate::model;
     use crate::test::*;
+    use instant::Duration;
     use olive_internal_macros as olive_im;
     use tokio::sync::mpsc;
+    use tokio::task;
+    use tokio::time::sleep;
 
     #[cfg(feature = "rhai")]
     #[olive_im::test]

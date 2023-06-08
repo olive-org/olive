@@ -9,7 +9,7 @@ use tokio::sync::{broadcast, mpsc};
 
 use crate::bpmn::schema::{FlowNodeType, StartEvent as Element};
 use crate::flow_node::{self, Action, FlowNode};
-use crate::process;
+use crate::process::{self, Log};
 use crate::sys::task;
 
 use super::ProcessEvent;
@@ -18,6 +18,7 @@ use super::ProcessEvent;
 pub struct StartEvent {
     element: Arc<Element>,
     state: State,
+    log_broadcast: Option<broadcast::Sender<Log>>,
     event_receivers: Vec<broadcast::Receiver<ProcessEvent>>,
     waker_sender: mpsc::Sender<Waker>,
     waker_receiver: Option<mpsc::Receiver<Waker>>,
@@ -30,6 +31,7 @@ impl StartEvent {
         Self {
             element: Arc::new(element),
             state: State::Initialized,
+            log_broadcast: None,
             event_receivers: vec![],
             waker_sender,
             waker_receiver: Some(waker_receiver),
@@ -75,7 +77,8 @@ impl FlowNode for StartEvent {
         Box::new(self.element.as_ref().clone())
     }
 
-    fn set_process(&mut self, process: crate::process::Handle) {
+    fn set_process(&mut self, process: process::Handle) {
+        self.log_broadcast.replace(process.log_broadcast());
         if let State::Initialized = self.state {
             self.state = State::Ready;
             if let Some(mut waker_receiver) = self.waker_receiver.take() {
@@ -151,6 +154,13 @@ impl Stream for StartEvent {
             }
             State::Complete => {
                 self.state = State::Done;
+                // if let Some(log_broadcast) = &self.log_broadcast {
+                //     let node = Box::new(self.element.as_ref().clone());
+                //     let _ = log_broadcast.send(Log::FlowNodeCompleted {
+                //         node,
+                //         context: None,
+                //     });
+                // }
                 Poll::Ready(Some(Action::Complete))
             }
             State::Done => {
@@ -182,7 +192,7 @@ mod tests {
 
         assert!(
             mailbox
-                .receive(|e| if let Log::FlowNodeCompleted { node } = e {
+                .receive(|e| if let Log::FlowNodeCompleted { node, .. } = e {
                     matches!(node.downcast_ref::<StartEvent>(),
                     Some(start_event) if start_event.id().as_ref().unwrap() == "start")
                 } else {
@@ -193,7 +203,7 @@ mod tests {
 
         assert!(
             mailbox
-                .receive(|e| if let Log::FlowNodeCompleted { node } = e {
+                .receive(|e| if let Log::FlowNodeCompleted { node, .. } = e {
                     matches!(node.downcast_ref::<EndEvent>(),
                     Some(end_event) if end_event.id().as_ref().unwrap() == "end")
                 } else {

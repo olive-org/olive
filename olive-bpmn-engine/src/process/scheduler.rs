@@ -3,6 +3,7 @@
 //! This is where the magic happens
 use derive_more::{Deref, DerefMut};
 use futures::stream::{Stream, StreamExt};
+use schema::BaseElementType;
 use streamunordered::{StreamUnordered, StreamYield};
 use tokio::sync::{broadcast, mpsc, oneshot, RwLock};
 
@@ -16,6 +17,7 @@ use crate::bpmn::schema::{
     self, DocumentElementContainer, Element as E, Expr, FormalExpression, Process, ProcessType,
     SequenceFlow, SequenceFlowConditionExpression,
 };
+use crate::context::Context as SchedulerContext;
 use crate::data_object::{self, DataObject};
 use crate::event::ProcessEvent as Event;
 use crate::flow_node;
@@ -25,6 +27,7 @@ use crate::sys::task;
 pub(crate) struct Scheduler {
     receiver: mpsc::Receiver<Request>,
     process: Handle,
+    context: SchedulerContext,
     flow_nodes: StreamUnordered<FlowNode>,
     // sequence flow => (token, index)
     flow_nodes_outgoing: HashMap<String, (usize, usize)>,
@@ -76,6 +79,11 @@ impl Scheduler {
         let mut flow_nodes = StreamUnordered::new();
         let mut flow_nodes_outgoing = HashMap::new();
         let mut flow_nodes_incoming = HashMap::new();
+
+        let context = match process.element().extension_elements() {
+            Some(el) => SchedulerContext::from(el.clone()),
+            None => SchedulerContext::new(),
+        };
 
         for flow_node in process
             .element()
@@ -170,6 +178,7 @@ impl Scheduler {
         Self {
             receiver,
             process,
+            context,
             flow_nodes,
             flow_nodes_outgoing,
             flow_nodes_incoming,
@@ -281,12 +290,6 @@ impl Scheduler {
         if let StreamYield::Item(action) = next {
             let next_action = self.next_action(Some(action), token);
             match next_action {
-                // We're good to proceed with the following execute action
-                // Control::Proceed(Some(flow_node::Action::Execute(_))) => {
-                //     let el = self.flow_nodes.get(token).unwrap().element();
-                //     let _ = el.extension_elements();
-                    
-                // }
                 // We're good to proceed with the following probing action
                 Control::Proceed(Some(flow_node::Action::ProbeOutgoingSequenceFlows(indices))) => {
                     let outgoings = self
@@ -347,6 +350,8 @@ impl Scheduler {
                                     node.tokens(next_node.tokens);
                                     // and report the incoming
                                     node.incoming(*index);
+                                    // set the flow node context
+                                    node.set_context(&self.context)
                                 }
                             }
                         }
@@ -354,14 +359,22 @@ impl Scheduler {
                 }
                 // flow node completion
                 Control::Proceed(Some(flow_node::Action::Complete)) => {
+                    let element = self.flow_nodes.get(token).unwrap();
+                    if let Some(flow_node_context) = element.get_context() {
+                        self.context.merge(flow_node_context);
+                    }
+                    let node = element.element().clone();
                     let _ = self.log_broadcast.send(Log::FlowNodeCompleted {
-                        node: self.flow_nodes.get(token).unwrap().element().clone(),
+                        node,
+                        context: Some(self.context.clone()),
                     });
                 }
                 // nothing, don't reschedule this flow node anymore
                 Control::Proceed(None) => {
                     if self.flow_nodes.is_empty() {
-                        let _ = self.log_broadcast.send(Log::Done);
+                        let _ = self.log_broadcast.send(Log::Done {
+                            context: Some(self.context.clone()),
+                        });
                     }
                     Pin::new(&mut self.flow_nodes).remove(token);
                 }

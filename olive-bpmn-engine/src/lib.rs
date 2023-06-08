@@ -14,6 +14,7 @@
 //! resumed with little to no consideration when a failure happen.
 pub mod activity;
 pub mod bpmn;
+pub mod context;
 pub mod data_object;
 pub mod event;
 pub mod flow_node;
@@ -21,7 +22,6 @@ pub mod gateway;
 pub mod language;
 pub mod model;
 pub mod process;
-pub mod context;
 
 #[cfg(test)]
 pub mod test;

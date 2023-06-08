@@ -27,6 +27,7 @@ use crate::process::{self, Log};
 use crate::sys::task;
 
 pub mod script_task;
+pub mod service_task;
 
 pub trait Activity: FlowNode {
     /// Signals execution request
@@ -754,7 +755,7 @@ where
                 let token = self.flow_node_tokens[0];
                 if let Variant::Ready { .. } = self.variant {
                     if let Some(flow_node) = self.flow_nodes.get_mut(token) {
-                        flow_node.execute()
+                        flow_node.execute();
                     }
                     self.variant = Variant::Executing;
                 }
@@ -804,7 +805,7 @@ where
                 if should_run {
                     if let Variant::Ready { .. } = me.variant {
                         if let Some(flow_node) = me.flow_nodes.get_mut(me.flow_node_tokens[0]) {
-                            flow_node.execute()
+                            flow_node.execute();
                         }
                         me.variant = Variant::Executing;
                     }
@@ -875,7 +876,7 @@ where
                 let me = self.get_mut();
                 if let Variant::Ready { .. } = me.variant {
                     if let Some(flow_node) = me.flow_nodes.get_mut(me.flow_node_tokens[0]) {
-                        flow_node.execute()
+                        flow_node.execute();
                     }
                     me.variant = Variant::Executing;
                 }
@@ -917,7 +918,7 @@ where
                 let me = self.get_mut();
                 if let Variant::Ready { .. } = me.variant {
                     for flow_node in me.flow_nodes.iter_mut() {
-                        flow_node.execute()
+                        flow_node.execute();
                     }
 
                     me.variant = Variant::Executing;

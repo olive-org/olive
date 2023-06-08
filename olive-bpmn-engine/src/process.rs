@@ -6,6 +6,7 @@ use tokio::sync::{broadcast, mpsc, oneshot, RwLock};
 use tokio::task::{self, JoinHandle};
 
 use crate::bpmn::schema::{FlowNodeType, Process as Element};
+use crate::context::Context;
 use crate::data_object::DataObject;
 use crate::event::ProcessEvent as Event;
 use crate::{flow_node, model};
@@ -53,10 +54,15 @@ pub enum DataObjectError {
 }
 
 /// Service Task Execute Error
-#[derive(Error, Debug, PartialEq)]
-pub enum ExecuteError {
+#[derive(Clone, Error, Debug, PartialEq)]
+pub enum ExecutionError {
     #[error("request timeout")]
     Timeout,
+    #[error("{message}")]
+    RestryErr {
+        message: String,
+        retries: Option<i32>,
+    },
 }
 
 pub(crate) enum Request {
@@ -81,16 +87,18 @@ pub enum Log {
         incoming_index: flow_node::IncomingIndex,
     },
     /// Flow node execution beeing executing
-    // FlowNodeExecuting {
-    //     #[serde(serialize_with = "crate::serde::serialize_flow_node")]
-    //     node: Box<dyn FlowNodeType>,
-    //     #[serde(skip_serializing)]
-    //     sender: mpsc::Sender<Result<(), ExecuteError>>  
-    // },
+    FlowNodeExecuting {
+        #[serde(serialize_with = "crate::serde::serialize_flow_node")]
+        node: Box<dyn FlowNodeType>,
+        context: Option<Context>,
+        #[serde(skip_serializing)]
+        sender: mpsc::Sender<Result<Option<Context>, ExecutionError>>,
+    },
     /// Flow node execution has been completed
     FlowNodeCompleted {
         #[serde(serialize_with = "crate::serde::serialize_flow_node")]
         node: Box<dyn FlowNodeType>,
+        context: Option<Context>,
     },
     #[cfg(test)]
     /// Flow node report of tokens (for testing)
@@ -108,8 +116,10 @@ pub enum Log {
     ExpressionError { error: String },
     /// Script evaluation error
     ScriptError { error: String },
+    /// Task Execution Error
+    ExecutionError,
     /// There are no more flow nodes to schedule, ever
-    Done,
+    Done { context: Option<Context> },
 }
 
 impl Process {
@@ -257,7 +267,7 @@ mod tests {
         assert!(handle.start().await.is_ok());
         assert!(
             mailbox
-                .receive(|e| if let Log::FlowNodeCompleted { node } = e {
+                .receive(|e| if let Log::FlowNodeCompleted { node, .. } = e {
                     matches!(node.downcast_ref::<StartEvent>(),
                     Some(start_event) if start_event.id().as_ref().unwrap() == "start")
                 } else {
@@ -300,7 +310,7 @@ mod tests {
 
         assert!(
             mailbox
-                .receive(|e| if let Log::FlowNodeCompleted { node } = e {
+                .receive(|e| if let Log::FlowNodeCompleted { node, .. } = e {
                     matches!(node.downcast_ref::<StartEvent>(),
                     Some(start_event) if start_event.id().as_ref().unwrap() == "start1")
                 } else {
@@ -311,7 +321,7 @@ mod tests {
 
         assert!(
             mailbox
-                .receive(|e| if let Log::FlowNodeCompleted { node } = e {
+                .receive(|e| if let Log::FlowNodeCompleted { node, .. } = e {
                     matches!(node.downcast_ref::<StartEvent>(),
                     Some(start_event) if start_event.id().as_ref().unwrap() == "start2")
                 } else {
