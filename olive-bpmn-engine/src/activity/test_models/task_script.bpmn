@@ -8,7 +8,7 @@
     <bpmn:scriptTask id="script">
       <bpmn:incoming>Flow_00jzs7a</bpmn:incoming>
       <bpmn:outgoing>Flow_0yfenlf</bpmn:outgoing>
-      <bpmn:script>1;</bpmn:script>
+      <bpmn:script>notify();</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:endEvent id="end">
       <bpmn:incoming>Flow_0yfenlf</bpmn:incoming>

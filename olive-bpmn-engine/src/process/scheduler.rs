@@ -2,7 +2,7 @@
 //!
 //! This is where the magic happens
 use derive_more::{Deref, DerefMut};
-use futures::stream::{Stream, StreamExt};
+use futures::stream::{Count, Stream, StreamExt};
 use schema::BaseElementType;
 use streamunordered::{StreamUnordered, StreamYield};
 use tokio::sync::{broadcast, mpsc, oneshot, RwLock};
@@ -21,7 +21,7 @@ use crate::context::Context as SchedulerContext;
 use crate::data_object::{self, DataObject};
 use crate::event::ProcessEvent as Event;
 use crate::flow_node;
-use crate::language::{Engine as _, EngineContextProvider, MultiLanguageEngine};
+use crate::language::{Engine as _, EngineContextProvider, MultiLanguageEngine, EngineContext};
 use crate::sys::task;
 
 pub(crate) struct Scheduler {
@@ -67,6 +67,7 @@ impl Stream for FlowNode {
 }
 
 /// Internal flow node scheduler control
+#[derive(Debug)]
 enum Control {
     // Continue with this action
     Proceed(Option<flow_node::Action>),
@@ -228,6 +229,9 @@ impl Scheduler {
         {
             let expr = expr.clone();
             let mut ctx = self.expression_evaluator.new_context();
+            self.context.get_properties().for_each(|(k, v)| {
+                ctx.set(k.as_str(), Box::new(v.clone()));
+            });
             match self
                 .expression_evaluator
                 .eval::<bool>(&expr, &mut ctx)
@@ -287,6 +291,7 @@ impl Scheduler {
             // at least because of this check we can safely unwrap `flow_nodes.get*` below
             return;
         }
+
         if let StreamYield::Item(action) = next {
             let next_action = self.next_action(Some(action), token);
             match next_action {
@@ -371,12 +376,12 @@ impl Scheduler {
                 }
                 // nothing, don't reschedule this flow node anymore
                 Control::Proceed(None) => {
+                    Pin::new(&mut self.flow_nodes).remove(token);
                     if self.flow_nodes.is_empty() {
                         let _ = self.log_broadcast.send(Log::Done {
                             context: Some(self.context.clone()),
                         });
                     }
-                    Pin::new(&mut self.flow_nodes).remove(token);
                 }
                 // no action to be taken
                 Control::Drop => {}

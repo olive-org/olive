@@ -107,7 +107,7 @@ impl Rhai {
         ))
     }
 
-    fn unveil(value: &mut Box<dyn DataObject>) -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+    fn to_ref(value: &mut Box<dyn DataObject>) -> Result<Dynamic, Box<rhai::EvalAltResult>> {
         let value = dyn_clone::clone_box(value);
         if let Some(data_object::Container(v)) = value.downcast_ref::<data_object::Container<u8>>()
         {
@@ -161,7 +161,7 @@ impl Rhai {
         {
             let mut arr = vec![];
             for mut v in c.drain(..) {
-                let item = Rhai::unveil(&mut v)?;
+                let item = Rhai::to_ref(&mut v)?;
                 arr.push(item);
             }
             Ok(Dynamic::from(arr))
@@ -205,7 +205,7 @@ impl Default for Rhai {
             .register_fn("data_object", Rhai::data_object::<rhai::Array>)
             .register_fn("data_object", Rhai::data_object::<rhai::Map>)
             .register_fn("data_object", Rhai::data_object::<rhai::ImmutableString>)
-            .register_fn("unveil", Rhai::unveil)
+            .register_fn("ref", Rhai::to_ref)
             .register_type_with_name::<Vec<Box<dyn DataObject>>>("Output")
             .register_fn("output", Rhai::output);
 
@@ -490,7 +490,7 @@ mod tests {
         let result = e
             .eval::<bool>(
                 &FormalExpression {
-                    content: Some(r#"a.unveil() == "a""#.into()),
+                    content: Some(r#"a.ref() == "a""#.into()),
                     ..Default::default()
                 },
                 &mut ctx,
@@ -502,7 +502,7 @@ mod tests {
         assert!(e
             .eval::<bool>(
                 &FormalExpression {
-                    content: Some("b.unveil() > 1".into()),
+                    content: Some("b.ref() > 1".into()),
                     ..Default::default()
                 },
                 &mut ctx,
@@ -538,7 +538,7 @@ mod tests {
         assert_eq!(
             e.eval::<i32>(
                 &FormalExpression {
-                    content: Some("val.unveil()".into()),
+                    content: Some("val.ref()".into()),
                     ..Default::default()
                 },
                 &mut context
@@ -557,7 +557,7 @@ mod tests {
         assert_eq!(
             e.eval::<Dynamic>(
                 &FormalExpression {
-                    content: Some("val.unveil()".into()),
+                    content: Some("val.ref()".into()),
                     ..Default::default()
                 },
                 &mut context
@@ -582,7 +582,7 @@ mod tests {
         assert_eq!(
             e.eval::<i32>(
                 &FormalExpression {
-                    content: Some("val.unveil()[0]".into()),
+                    content: Some("val.ref()[0]".into()),
                     ..Default::default()
                 },
                 &mut context
@@ -601,7 +601,7 @@ mod tests {
         assert_eq!(
             e.eval::<bool>(
                 &FormalExpression {
-                    content: Some("val.unveil()".into()),
+                    content: Some("val.ref()".into()),
                     ..Default::default()
                 },
                 &mut context
@@ -620,7 +620,7 @@ mod tests {
         assert_eq!(
             e.eval::<i64>(
                 &FormalExpression {
-                    content: Some("data_object(100).unveil()".into()),
+                    content: Some("data_object(100).ref()".into()),
                     ..Default::default()
                 },
                 &mut context

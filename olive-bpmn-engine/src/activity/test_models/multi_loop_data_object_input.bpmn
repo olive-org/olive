@@ -21,7 +21,7 @@
         <bpmn:loopDataInputRef>data_object</bpmn:loopDataInputRef>
         <bpmn:inputDataItem id="loop_input" />
       </bpmn:multiInstanceLoopCharacteristics>
-      <bpmn:script>notify(input.unveil()[0]);</bpmn:script>
+      <bpmn:script>notify(input.ref()[0]);</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="data_object" dataObjectRef="DataObject_08crhde" />
     <bpmn:dataObject id="DataObject_08crhde" isCollection="true" />
