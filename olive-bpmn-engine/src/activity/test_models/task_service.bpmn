@@ -4,9 +4,24 @@
     <bpmn:startEvent id="start">
       <bpmn:outgoing>Flow_00jzs7a</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_00jzs7a" sourceRef="start" targetRef="service" />
-    <bpmn:serviceTask id="service">
+    <bpmn:sequenceFlow id="Flow_00jzs7a" sourceRef="start" targetRef="service1" />
+    <bpmn:serviceTask id="service1">
       <bpmn:incoming>Flow_00jzs7a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yfenls</bpmn:outgoing>
+      <bpmn:extensionElements>
+        <olive:taskDefinition type="service"/>
+        <olive:taskHeaders>
+          <olive:item key="contentType" value="aplication/json" type="string"/>
+        </olive:taskHeaders>
+        <olive:properties>
+          <olive:item key="a" value="1" type="integer"/>
+          <olive:item key="b" value="{&#34;a&#34;: &#34;b&#34;}" type="object"/>
+        </olive:properties>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0yfenls" sourceRef="service1" targetRef="service2" />
+    <bpmn:serviceTask id="service2">
+      <bpmn:incoming>Flow_0yfenls</bpmn:incoming>
       <bpmn:outgoing>Flow_0yfenlf</bpmn:outgoing>
       <bpmn:extensionElements>
         <olive:taskDefinition type="service"/>
@@ -22,9 +37,9 @@
     <bpmn:endEvent id="end">
       <bpmn:incoming>Flow_0yfenlf</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0yfenlf" sourceRef="service" targetRef="end" />
+    <bpmn:sequenceFlow id="Flow_0yfenlf" sourceRef="service2" targetRef="end" />
   </bpmn:process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+  <!-- <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="proc1">
       <bpmndi:BPMNEdge id="Flow_00jzs7a_di" bpmnElement="Flow_00jzs7a">
         <di:waypoint x="215" y="117" />
@@ -44,5 +59,5 @@
         <dc:Bounds x="432" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
-  </bpmndi:BPMNDiagram>
+  </bpmndi:BPMNDiagram> -->
 </bpmn:definitions>

@@ -88,6 +88,7 @@ impl Stream for EndEvent {
             }
             State::Complete => {
                 self.state = State::Done;
+                self.waker.replace(cx.waker().clone());
                 if let Some(event_broadcaster) = self.event_broadcaster.as_ref() {
                     let _ = event_broadcaster.send(ProcessEvent::End);
                 }

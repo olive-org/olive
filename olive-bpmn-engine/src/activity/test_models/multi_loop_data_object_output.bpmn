@@ -34,8 +34,8 @@
         <bpmn:inputDataItem id="loop_input" />
         <bpmn:outputDataItem id="loop_output" />
       </bpmn:multiInstanceLoopCharacteristics>
-      <bpmn:script>notify(input.unveil()[0]);
-output([input.unveil()[0].to_int().data_object()])</bpmn:script>
+      <bpmn:script>notify(input.ref()[0]);
+output([input.ref()[0].to_int().data_object()])</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="data_object" name="Input" dataObjectRef="DataObject_08crhde" />
     <bpmn:dataObject id="DataObject_08crhde" isCollection="true" />

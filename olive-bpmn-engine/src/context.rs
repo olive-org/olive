@@ -1,6 +1,6 @@
 //! Process Scheduler Context
 
-use std::collections::HashMap;
+use std::collections::{hash_map::Iter, HashMap};
 
 use crate::bpmn::schema::{ExtensionElements, Item, Properties, TaskDefinition, TaskHeaders};
 use serde::{Deserialize, Serialize};
@@ -39,6 +39,10 @@ impl Context {
         self.headers.get(name)
     }
 
+    pub fn get_headers(&self) -> Iter<String, Value> {
+        self.headers.iter()
+    }
+
     pub fn get_header_mut(&mut self, name: &str) -> Option<&mut Value> {
         self.headers.get_mut(name)
     }
@@ -47,15 +51,19 @@ impl Context {
         self.headers.insert(name.to_string(), value.clone());
     }
 
-    pub fn get_properties(&self, name: &str) -> Option<&Value> {
+    pub fn get_property(&self, name: &str) -> Option<&Value> {
         self.properties.get(name)
     }
 
-    pub fn get_properties_mut(&mut self, name: &str) -> Option<&mut Value> {
+    pub fn get_property_mut(&mut self, name: &str) -> Option<&mut Value> {
         self.properties.get_mut(name)
     }
 
-    pub fn set_properties(&mut self, name: &str, value: &Value) {
+    pub fn get_properties(&self) -> Iter<String, Value> {
+        self.properties.iter()
+    }
+
+    pub fn set_property(&mut self, name: &str, value: &Value) {
         self.properties.insert(name.to_string(), value.clone());
     }
 
@@ -73,8 +81,8 @@ impl Context {
         }
         for (k, v) in &mut self.properties {
             let result = match v {
-                Value::String(x) if x.is_empty() => other.get_properties(k.as_str()),
-                Value::Object(x) if x.is_empty() => other.get_properties(k.as_str()),
+                Value::String(x) if x.is_empty() => other.get_property(k.as_str()),
+                Value::Object(x) if x.is_empty() => other.get_property(k.as_str()),
                 _ => None,
             };
 
@@ -96,9 +104,9 @@ impl Context {
             }
         }
         for (k, v) in &other.properties {
-            match self.get_properties_mut(k.as_str()) {
-                None => self.set_properties(k, v),
-                Some(Value::Null) => self.set_properties(k, v),
+            match self.get_property_mut(k.as_str()) {
+                None => self.set_property(k, v),
+                Some(Value::Null) => self.set_property(k, v),
                 _ => {}
             }
         }
@@ -192,7 +200,9 @@ pub fn parse_item(item: &Item) -> Option<(String, Value)> {
                     }
                 }
                 "object" => {
-                    if let Ok(v) = serde_json::from_str::<serde_json::Map<String, Value>>(&html_escape::decode_html_entities(value)) {
+                    if let Ok(v) = serde_json::from_str::<serde_json::Map<String, Value>>(
+                        &html_escape::decode_html_entities(value),
+                    ) {
                         serde_value = Value::Object(v)
                     }
                 }
@@ -251,12 +261,12 @@ mod test {
 
         c1.set_service_type(Some("service".to_string()));
         c1.set_header("a", &json!("a".to_string()));
-        c2.set_properties("version", &json!(1));
+        c2.set_property("version", &json!(1));
 
         c2.merge(&c1);
         assert_eq!(c2.get_service_type(), Some(&"service".to_string()));
         assert_eq!(c2.get_header("a"), Some(&json!("a".to_string())));
-        assert_eq!(c2.get_properties("version"), Some(&json!(1)));
+        assert_eq!(c2.get_property("version"), Some(&json!(1)));
     }
 
     #[test]

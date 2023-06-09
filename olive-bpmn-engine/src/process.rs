@@ -92,7 +92,7 @@ pub enum Log {
         node: Box<dyn FlowNodeType>,
         context: Option<Context>,
         #[serde(skip_serializing)]
-        sender: mpsc::Sender<Result<Option<Context>, ExecutionError>>,
+        sender: broadcast::Sender<Result<Option<Context>, ExecutionError>>,
     },
     /// Flow node execution has been completed
     FlowNodeCompleted {

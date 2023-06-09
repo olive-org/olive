@@ -47,7 +47,7 @@
         <bpmn:sourceRef>out</bpmn:sourceRef>
         <bpmn:targetRef>output</bpmn:targetRef>
       </bpmn:dataOutputAssociation>
-      <bpmn:script>notify(input.unveil());
+      <bpmn:script>notify(input.ref());
 output([1.data_object()])</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:dataObjectReference id="data_object" name="Data" dataObjectRef="DataObject_03con8p" />
