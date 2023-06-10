@@ -228,7 +228,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn runs() {
-        let definitions = parse(include_str!("test_models/task_script.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/task_script.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let sender_clone = sender.clone();
         let model =

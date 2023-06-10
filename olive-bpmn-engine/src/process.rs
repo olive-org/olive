@@ -392,7 +392,7 @@ mod tests {
     async fn data_object() {
         use crate::data_object;
         use serde_json::json;
-        let definitions = parse(include_str!("process/test_models/data_object.bpmn")).unwrap();
+        let definitions = parse(include_str!("process/../../../definitions/data_object.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
         let handle = model.processes().await.unwrap().pop().unwrap();
         let data_object = handle.data_object("data_object").await.unwrap();

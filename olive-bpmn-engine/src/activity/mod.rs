@@ -1130,7 +1130,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn singular_runs_once() {
-        let definitions = parse(include_str!("test_models/task_script.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/task_script.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let sender_clone = sender.clone();
         let model =
@@ -1163,7 +1163,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn standard_loop_after() {
-        let definitions = parse(include_str!("test_models/standard_loop.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/standard_loop.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let (ctrl_sender, _) = broadcast::channel(10);
         let ctrl_sender_clone = ctrl_sender.clone();
@@ -1216,7 +1216,7 @@ mod tests {
     #[olive_im::test]
     async fn standard_loop_test_before() {
         let definitions =
-            parse(include_str!("test_models/standard_loop_test_before.bpmn")).unwrap();
+            parse(include_str!("../../../definitions/standard_loop_test_before.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let (ctrl_sender, _) = broadcast::channel(10);
         let ctrl_sender_clone = ctrl_sender.clone();
@@ -1273,7 +1273,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn standard_loop_max() {
-        let definitions = parse(include_str!("test_models/standard_loop_max.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/standard_loop_max.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let (ctrl_sender, _) = broadcast::channel(10);
         let ctrl_sender_clone = ctrl_sender.clone();
@@ -1325,7 +1325,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn multi_loop_cardinality() {
-        let definitions = parse(include_str!("test_models/multi_loop_cardinality.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/multi_loop_cardinality.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let model = model::Model::new(definitions).with_script_engine_factory(
             model::FnLanguageEngineFactory(move || {
@@ -1365,7 +1365,7 @@ mod tests {
     #[olive_im::test]
     async fn multi_loop_cardinality_parallel() {
         let definitions = parse(include_str!(
-            "test_models/multi_loop_cardinality_parallel.bpmn"
+            "../../../definitions/multi_loop_cardinality_parallel.bpmn"
         ))
         .unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
@@ -1405,7 +1405,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn multi_loop_data_object() {
-        let definitions = parse(include_str!("test_models/multi_loop_data_object.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/multi_loop_data_object.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let model = model::Model::new(definitions).with_script_engine_factory(
             model::FnLanguageEngineFactory(move || {
@@ -1457,7 +1457,7 @@ mod tests {
     #[olive_im::test]
     async fn multi_loop_data_object_parallel() {
         let definitions = parse(include_str!(
-            "test_models/multi_loop_data_object_parallel.bpmn"
+            "../../../definitions/multi_loop_data_object_parallel.bpmn"
         ))
         .unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
@@ -1510,7 +1510,7 @@ mod tests {
     #[olive_im::test]
     async fn multi_loop_data_object_input() {
         let definitions = parse(include_str!(
-            "test_models/multi_loop_data_object_input.bpmn"
+            "../../../definitions/multi_loop_data_object_input.bpmn"
         ))
         .unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
@@ -1560,7 +1560,7 @@ mod tests {
     #[olive_im::test]
     async fn multi_loop_data_object_output() {
         let definitions = parse(include_str!(
-            "test_models/multi_loop_data_object_output.bpmn"
+            "../../../definitions/multi_loop_data_object_output.bpmn"
         ))
         .unwrap();
         let model = model::Model::new(definitions).with_script_engine_factory(
@@ -1627,7 +1627,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn input_data_object() {
-        let definitions = parse(include_str!("test_models/activity_io.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/activity_io.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let model = model::Model::new(definitions).with_script_engine_factory(
             model::FnLanguageEngineFactory(move || {
@@ -1671,7 +1671,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn input_property() {
-        let definitions = parse(include_str!("test_models/activity_io.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/activity_io.bpmn")).unwrap();
         let (sender, mut receiver) = mpsc::channel(10);
         let model = model::Model::new(definitions).with_script_engine_factory(
             model::FnLanguageEngineFactory(move || {
@@ -1715,7 +1715,7 @@ mod tests {
     #[cfg(feature = "rhai")]
     #[olive_im::test]
     async fn output_data_object() {
-        let definitions = parse(include_str!("test_models/activity_io.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/activity_io.bpmn")).unwrap();
         let model = model::Model::new(definitions).with_script_engine_factory(
             model::FnLanguageEngineFactory(move || {
                 use ::rhai::RegisterNativeFunction;

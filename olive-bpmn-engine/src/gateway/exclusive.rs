@@ -179,7 +179,7 @@ mod tests {
     #[olive_im::test]
     #[cfg(any(feature = "rhai"))]
     async fn choose_one() {
-        let definitions = parse(include_str!("test_models/exclusive_choose_one.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/exclusive_choose_one.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -222,7 +222,7 @@ mod tests {
     #[olive_im::test]
     #[cfg(any(feature = "rhai"))]
     async fn default() {
-        let definitions = parse(include_str!("test_models/exclusive_default.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/exclusive_default.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -266,7 +266,7 @@ mod tests {
     #[cfg(any(feature = "rhai"))]
     async fn no_default_path() {
         let definitions =
-            parse(include_str!("test_models/exclusive_no_default_path.bpmn")).unwrap();
+            parse(include_str!("../../../definitions/exclusive_no_default_path.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

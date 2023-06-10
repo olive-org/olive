@@ -127,7 +127,7 @@ mod tests {
 
     #[olive_im::test]
     async fn throw_none_event() {
-        let definitions = parse(include_str!("test_models/throw_none_event.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/throw_none_event.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -146,7 +146,7 @@ mod tests {
 
     #[olive_im::test]
     async fn throw_signal_event() {
-        let definitions = parse(include_str!("test_models/throw_signal_event.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/throw_signal_event.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

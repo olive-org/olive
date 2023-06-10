@@ -233,7 +233,7 @@ mod tests {
     #[olive_im::test]
     #[cfg(any(feature = "rhai"))]
     async fn fork() {
-        let definitions = parse(include_str!("test_models/inclusive_fork.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/inclusive_fork.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -283,7 +283,7 @@ mod tests {
     #[olive_im::test]
     #[cfg(any(feature = "rhai"))]
     async fn default() {
-        let definitions = parse(include_str!("test_models/inclusive_default.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/inclusive_default.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -327,7 +327,7 @@ mod tests {
     #[cfg(any(feature = "rhai"))]
     async fn no_default_path() {
         let definitions =
-            parse(include_str!("test_models/inclusive_no_default_path.bpmn")).unwrap();
+            parse(include_str!("../../../definitions/inclusive_no_default_path.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -348,7 +348,7 @@ mod tests {
     #[olive_im::test]
     #[cfg(any(feature = "rhai"))]
     async fn join() {
-        let definitions = parse(include_str!("test_models/inclusive_join.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/inclusive_join.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

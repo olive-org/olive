@@ -228,7 +228,7 @@ mod tests {
 
     #[olive_im::test]
     async fn catch_none_event() {
-        let definitions = parse(include_str!("test_models/catch_none_event.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/catch_none_event.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -254,7 +254,7 @@ mod tests {
 
     #[olive_im::test]
     async fn catch_signal_event() {
-        let definitions = parse(include_str!("test_models/catch_signal_event.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/catch_signal_event.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

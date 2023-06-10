@@ -117,7 +117,7 @@ mod tests {
 
     #[olive_im::test]
     async fn fork() {
-        let definitions = parse(include_str!("test_models/parallel_fork.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/parallel_fork.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -139,7 +139,7 @@ mod tests {
 
     #[olive_im::test]
     async fn join() {
-        let definitions = parse(include_str!("test_models/parallel_join.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/parallel_join.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -162,7 +162,7 @@ mod tests {
     #[olive_im::test]
     async fn not_enough_to_join() {
         let definitions =
-            parse(include_str!("test_models/parallel_not_enough_to_join.bpmn")).unwrap();
+            parse(include_str!("../../../definitions/parallel_not_enough_to_join.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

@@ -137,7 +137,7 @@ mod tests {
 
     #[olive_im::test]
     async fn event() {
-        let definitions = parse(include_str!("test_models/event.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/event.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

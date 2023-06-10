@@ -231,7 +231,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn runs() {
-        let definitions = parse(include_str!("test_models/task_service.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/task_service.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

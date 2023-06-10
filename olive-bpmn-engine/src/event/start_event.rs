@@ -172,7 +172,7 @@ mod tests {
 
     #[olive_im::test]
     async fn start_flows() {
-        let definitions = parse(include_str!("test_models/start_flows.bpmn")).unwrap();
+        let definitions = parse(include_str!("../../../definitions/start_flows.bpmn")).unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
