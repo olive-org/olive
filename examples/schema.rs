@@ -1,7 +1,5 @@
 #![warn(rust_2018_idioms)]
 
-pub mod engine;
-
 use olive_bpmn_schema::*;
 
 fn main() {

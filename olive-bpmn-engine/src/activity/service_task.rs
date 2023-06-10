@@ -32,7 +32,7 @@ impl Task {
             Some(el) => context::Context::from(el.clone()),
             None => context::Context::new(),
         };
-        let (sender, _) = broadcast::channel(10);
+        let (sender, _) = broadcast::channel(1);
         let state = Arc::new(RwLock::new(State::Initialized));
         Self {
             context,

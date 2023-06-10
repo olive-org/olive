@@ -63,7 +63,7 @@ impl FlowNode for Gateway {
         Box::new(self.element.as_ref().clone())
     }
 
-    fn incoming(&mut self, index: flow_node::IncomingIndex) {
+    fn incoming(&mut self, _index: flow_node::IncomingIndex) {
         if let State::Initialized = self.state {
             self.state = State::Ready;
             if let Some(waker) = self.waker.take() {

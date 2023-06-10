@@ -27,6 +27,7 @@ use crate::process::{self, Log};
 use crate::sys::task;
 
 pub mod script_task;
+pub mod user_task;
 pub mod service_task;
 
 pub trait Activity: FlowNode {

@@ -170,6 +170,7 @@ impl Into<ExtensionElements> for Context {
             task_definition,
             task_headers,
             properties,
+            ..Default::default()
         }
     }
 }

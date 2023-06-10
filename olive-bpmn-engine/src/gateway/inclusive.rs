@@ -80,7 +80,7 @@ impl FlowNode for Gateway {
         Box::new(self.element.as_ref().clone())
     }
 
-    fn incoming(&mut self, index: IncomingIndex) {
+    fn incoming(&mut self, _index: IncomingIndex) {
         self.state.incoming += 1;
         if let StateCase::Ready = self.state.case {
             self.state.case = StateCase::Probing

@@ -2,7 +2,7 @@
 //!
 //! This is where the magic happens
 use derive_more::{Deref, DerefMut};
-use futures::stream::{Count, Stream, StreamExt};
+use futures::stream::{Stream, StreamExt};
 use schema::BaseElementType;
 use streamunordered::{StreamUnordered, StreamYield};
 use tokio::sync::{broadcast, mpsc, oneshot, RwLock};
@@ -21,7 +21,7 @@ use crate::context::Context as SchedulerContext;
 use crate::data_object::{self, DataObject};
 use crate::event::ProcessEvent as Event;
 use crate::flow_node;
-use crate::language::{Engine as _, EngineContextProvider, MultiLanguageEngine, EngineContext};
+use crate::language::{Engine as _, EngineContext, EngineContextProvider, MultiLanguageEngine};
 use crate::sys::task;
 
 pub(crate) struct Scheduler {

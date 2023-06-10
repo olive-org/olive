@@ -357,6 +357,12 @@
                         <xsl:otherwise>
                                 <xsl:text>#[derive(Tia, Hash, Default, Clone, XmlRead, PartialEq, Debug, Serialize, Deserialize)]</xsl:text>
                                 <xsl:choose>
+                                    <xsl:when test="local:struct-case($typeName) = 'UserTaskForm'">
+                                        <xsl:text>#[xml(tag = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="local:struct-case($typeName) = 'FormDefinition'">
+                                        <xsl:text>#[xml(tag = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                                    </xsl:when>
                                     <xsl:when test="local:struct-case($typeName) = 'TaskDefinition'">
                                         <xsl:text>#[xml(tag = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
                                     </xsl:when>
@@ -591,19 +597,18 @@
                     <xsl:text>#[allow(unreachable_patterns)]</xsl:text>
                     <xsl:text>#[xml(</xsl:text>
                     <xsl:for-each select="$schema/xs:element[@substitutionGroup = $name]">
-                        <xsl:choose>
-                            <xsl:when test="$name = 'taskDefinition'">
-                                <xsl:text>child = "olive:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:text>child = "bpmn:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:text>child = "olive:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
                     </xsl:for-each>
                     <xsl:text>)]</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                         <xsl:choose>
+                            <xsl:when test="$name = 'userTaskForm'">
+                                <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                            </xsl:when>
+                            <xsl:when test="$name = 'formDefinition'">
+                                <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
+                            </xsl:when>
                             <xsl:when test="$name = 'taskDefinition'">
                                 <xsl:text>#[xml(</xsl:text><xsl:value-of select="local:elementTypeTag(.)"/><xsl:text> = "olive:</xsl:text><xsl:value-of select="$name"/><xsl:text>")]</xsl:text>
                             </xsl:when>

@@ -710,13 +710,32 @@
 	<xsd:complexType name="tExtensionElements">
 		<xsd:sequence>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="userTaskForm" minOccurs="0" maxOccurs="1"/>
 			<xsd:element ref="taskDefinition" minOccurs="0" maxOccurs="1"/>
 			<xsd:element ref="taskHeaders" minOccurs="0" maxOccurs="1"/>
 			<xsd:element ref="properties" minOccurs="0" maxOccurs="1"/>
+			<xsd:element ref="formDefinition" minOccurs="0" maxOccurs="1"/>
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<!-- olive extensive elements-->
+	<!-- olive extensive elements start -->
+	<xsd:element name="userTaskForm" type="tUserTaskForm"/>
+	<xsd:complexType name="tUserTaskForm">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      	</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string" />
+		<xsd:attribute name="value" type="xsd:string" />
+	</xsd:complexType>
+
+	<xsd:element name="formDefinition" type="tFormDefinition"/>
+	<xsd:complexType name="tFormDefinition">
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="formKey" type="xsd:string"/>
+	</xsd:complexType>
+
 	<xsd:element name="taskDefinition" type="tTaskDefinition"/>
 	<xsd:complexType name="tTaskDefinition">
 		<xsd:sequence>
@@ -748,8 +767,20 @@
 		</xsd:sequence>
 		<xsd:attribute name="key" type="xsd:string"/>
 		<xsd:attribute name="value" type="xsd:string"/>
-		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="type" type="tItemType"
+					default="string"/>
 	</xsd:complexType>
+
+	<xsd:simpleType name="tItemType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="integer"/>
+			<xsd:enumeration value="boolean"/>
+			<xsd:enumeration value="float"/>
+			<xsd:enumeration value="string"/>
+			<xsd:enumeration value="object"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- olive extensive elements end -->
 
 	<xsd:element name="flowElement" type="tFlowElement"/>
 	<xsd:complexType name="tFlowElement" abstract="true">

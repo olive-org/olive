@@ -3,7 +3,6 @@ use std::marker::PhantomData;
 
 use factory::ParameterizedFactory;
 use futures::Stream;
-use olive_bpmn_schema::ServiceTask;
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 use thiserror::Error;
@@ -11,7 +10,7 @@ use thiserror::Error;
 use crate::bpmn::schema::{
     ActivityType, DocumentElement, Element, EndEvent, EventBasedGateway, ExclusiveGateway,
     FlowNodeType, InclusiveGateway, IntermediateCatchEvent, IntermediateThrowEvent,
-    ParallelGateway, ScriptTask, SequenceFlow, StartEvent,
+    ParallelGateway, ScriptTask, ServiceTask, UserTask, SequenceFlow, StartEvent,
 };
 use crate::event::{end_event, intermediate_catch_event, intermediate_throw_event, start_event};
 use crate::{activity, process};
@@ -35,6 +34,7 @@ pub enum State {
     InclusiveGateway(gateway::inclusive::State),
     EventBasedGateway(gateway::event_based::State),
     ScriptTask(activity::script_task::State),
+    UserTask(activity::user_task::State),
     ServiceTask(activity::service_task::State),
     ActivityState(activity::State),
 }
@@ -190,6 +190,7 @@ pub(crate) fn new(element: Box<dyn DocumentElement>) -> Option<Box<dyn FlowNode>
             make::<EventBasedGateway, gateway::event_based::Gateway>(element)
         }
         Element::ScriptTask => make_activity::<ScriptTask, activity::script_task::Task>(element),
+        Element::UserTask => make_activity::<UserTask, activity::user_task::Task>(element),
         Element::ServiceTask => make_activity::<ServiceTask, activity::service_task::Task>(element),
         _ => None,
     }
