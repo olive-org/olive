@@ -1,2 +1,7 @@
 [workspace]
-members = ["olive-bpmn-schema", "olive-internal-macros", "olive-bpmn-engine"]
+members = [
+    "olive-bpmn-schema", 
+    "olive-internal-macros", 
+    "olive-bpmn-engine",
+    "examples",
+]
