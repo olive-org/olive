@@ -1,0 +1,28 @@
+[package]
+name = "bpmn_schema"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+keywords = ["bpmn", "workflow"]
+repository = "https://github.com/olive.org/olive"
+readme = "README.md"
+description = "Business Process eXecution Engine's BPMN schema"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+internal_macros = { workspace = true }
+thiserror = "1.0"
+# Used to parse BPMN to a typed schema
+strong-xml = "0.6.0"
+num-bigint = { version = "0.3.1", features = ["serde"] }
+# Used for schema traversals
+downcast-rs = "1.2"
+dyn-clone = "1.0.4"
+tia = "1.0.1"
+syn = "1.0.60"
+serde = { version = "1.0.119", features = ["derive"] }
+derive_more = "0.99.11"

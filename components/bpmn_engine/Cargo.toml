@@ -1,0 +1,53 @@
+[package]
+name = "bpmn_engine"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/olive.org/olive"
+readme = "README.md"
+description = "Business Process execution Engine for BPMN"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib","lib"]
+
+[dependencies]
+internal_macros = { workspace = true }
+bpmn_schema = { workspace = true }
+# Used to parse BPMN to a typed schema
+strong-xml = "0.6.0"
+# Used to 'normalize' BPMN XML before parsing
+# due to deficiencies of strong-xml
+sxd-document = "0.3.2"
+thiserror = "1.0"
+# Used for schema traversals
+downcast-rs = "1.2"
+dyn-clone = "1.0.4"
+tia = "1.0.0"
+tokio = { version = "1.28.0", features = ["macros", "rt-multi-thread", "time", "sync"] }
+futures = "0.3.12"
+serde = { version = "1.0.119", features = ["derive"] }
+smallvec = { version = "1.6.1", features = ["serde"] }
+rhai = { version = "1.14.0", features = ["sync", "serde"], optional = true}
+async-trait = "0.1"
+factory = "0.1.2"
+num-bigint = { version = "0.3.1", features = ["serde"] }
+serde_json = "1.0"
+streamunordered = "^0.5.2"
+derive_more = "0.99.11"
+instant = "0.1.9"
+wasm-rs-dbg = "^0.1.2"
+wasm-rs-async-executor = { version = "^0.8.1", features = ["debug"] }
+num-traits = "0.2.14"
+html-escape = "0.2.13"
+
+[dev-dependencies]
+serde_yaml = "0.8"
+toml = "0.5"
+ron = "0.6"
+rmp-serde = "0.15"
+pin-project = "1"
+
+[features]
+default = ["rhai"]

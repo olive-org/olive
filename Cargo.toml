@@ -1,7 +1,15 @@
 [workspace]
 members = [
-    "olive-bpmn-schema", 
-    "olive-internal-macros", 
-    "olive-bpmn-engine",
+    # components
+    "components/internal_macros", 
+    "components/bpmn_schema", 
+    "components/bpmn_engine",
+
+    # internal member
     "examples",
 ]
+
+[workspace.dependencies]
+internal_macros = { path = "components/internal_macros" }
+bpmn_schema = { path = "components/bpmn_schema" }
+bpmn_engine = { path = "components/bpmn_engine" }

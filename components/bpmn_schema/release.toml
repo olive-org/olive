@@ -1,0 +1,3 @@
+pre-release-replacements = [
+  {file="Cargo.toml", search="internal_macros = .*",replace="internal_macros = { path = \"../internal_macros\", version = \"{{version}}\" }"},
+]

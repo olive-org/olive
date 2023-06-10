@@ -1,6 +1,6 @@
 #![warn(rust_2018_idioms)]
 
-use olive_bpmn_schema::*;
+use bpmn_schema::*;
 
 fn main() {
     let mut process = Process {

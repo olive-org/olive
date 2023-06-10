@@ -1,3 +1,0 @@
-pre-release-replacements = [
-  {file="Cargo.toml", search="olive-internal-macros = .*",replace="olive-internal-macros = { path = \"../olive-internal-macros\", version = \"{{version}}\" }"},
-]
