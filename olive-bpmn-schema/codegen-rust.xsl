@@ -588,9 +588,9 @@
             <xsl:variable name="name" select="local:elementName(.)"/>
             <xsl:choose>
                 <xsl:when test="count($schema/xs:element[@substitutionGroup = $name]) > 1">
+                    <xsl:text>#[allow(unreachable_patterns)]</xsl:text>
                     <xsl:text>#[xml(</xsl:text>
                     <xsl:for-each select="$schema/xs:element[@substitutionGroup = $name]">
-                        <xsl:text>child = "bpmn:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
                         <xsl:choose>
                             <xsl:when test="$name = 'taskDefinition'">
                                 <xsl:text>child = "olive:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
