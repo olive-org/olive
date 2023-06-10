@@ -597,7 +597,7 @@
                     <xsl:text>#[allow(unreachable_patterns)]</xsl:text>
                     <xsl:text>#[xml(</xsl:text>
                     <xsl:for-each select="$schema/xs:element[@substitutionGroup = $name]">
-                        <xsl:text>child = "olive:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
+                        <xsl:text>child = "bpmn:</xsl:text><xsl:value-of select="./@name"/><xsl:text>",</xsl:text>
                     </xsl:for-each>
                     <xsl:text>)]</xsl:text>
                 </xsl:when>
