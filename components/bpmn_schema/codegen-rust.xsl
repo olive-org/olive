@@ -492,8 +492,8 @@
                     /// Wrapper for </xsl:text><xsl:value-of select="$schema/xs:element[@type = $ancestor/@name]/@name"/><xsl:text>::</xsl:text><xsl:value-of select="./@name"/>
                 <xsl:text xml:space="preserve"> element</xsl:text>
                 <xsl:text>
-                    #[serde(transparent)]
                     #[derive(Hash, Default, From, Clone, PartialEq, Debug, Serialize, Deserialize, Deref, DerefMut)]</xsl:text>
+                    #[serde(transparent)]
                 <xsl:text xml:space="preserve">pub struct </xsl:text><xsl:value-of select="$typePrefix"/><xsl:value-of select="local:struct-case(./@name)"/><xsl:text>(pub </xsl:text>
                 <xsl:value-of select="local:rename-type(local:struct-case($typeName))"/>
                 <xsl:text>);</xsl:text>

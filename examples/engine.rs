@@ -15,7 +15,6 @@ async fn main() {
     let mut recevier = handle.log_receiver();
 
     assert!(handle.start().await.is_ok());
-    println!("1");
 
     let _ = task::spawn(async move {
         loop {

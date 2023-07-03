@@ -11,7 +11,6 @@ use crate::bpmn::schema::{FlowNodeType, StartEvent as Element};
 use crate::flow_node::{self, Action, FlowNode};
 use crate::process;
 use crate::sys::task;
-
 use super::ProcessEvent;
 
 /// Start Event flow node

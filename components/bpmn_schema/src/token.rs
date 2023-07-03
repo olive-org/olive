@@ -7,7 +7,7 @@
 use strong_xml::xmlparser::{ElementEnd, Token};
 use strong_xml::{XmlError, XmlReader, XmlResult};
 
-pub(crate) trait ReadSource {
+pub trait ReadSource {
     /// Reads an element to the end and returns the source of it, renamed.
     ///
     /// This is done so that we can use other XmlReaders that were generated
