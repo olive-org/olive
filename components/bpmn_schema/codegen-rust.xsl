@@ -7,6 +7,8 @@
     
     <xsl:output method="text"/>
     
+    <!-- <xsl:variable name="schema"
+        select="(/ | document(/xs:schema/(xs:include|xs:import)/@schemaLocation))/xs:schema"/> -->
     <xsl:variable name="schema"
         select="(/ | document(/xs:schema/xs:include/@schemaLocation))/xs:schema"/>
     <xsl:variable name="elements" select="$schema//xs:element"/>
@@ -956,8 +958,5 @@
             
         </xsl:for-each>
     </xsl:template>
-    
-    
-    
     
 </xsl:stylesheet>

@@ -401,8 +401,10 @@ impl Scheduler {
             let _ = sender.send(Err(StartError::NoStartEvent));
         } else {
             let event_broadcast = self.process.event_broadcast();
-            let _ = event_broadcast.send(Event::Start);
-            let _ = sender.send(Ok(()));
+            let result = event_broadcast.send(Event::Start);
+            assert!(result.is_ok());
+            let result = sender.send(Ok(()));
+            assert!(result.is_ok());
         }
     }
 

@@ -80,6 +80,7 @@ impl FlowNode for StartEvent {
             self.state = State::Ready;
             if let Some(mut waker_receiver) = self.waker_receiver.take() {
                 let mut event_receiver = process.event_receiver();
+                let event_sender = process.event_broadcast();
                 task::spawn(async move {
                     let mut waker = None;
                     loop {
@@ -93,6 +94,8 @@ impl FlowNode for StartEvent {
                                 // or should we wake on any event as we do now?
                                 if let Some(waker) = waker.take() {
                                     waker.wake();
+                                } else {
+                                    let _ = event_sender.send(ProcessEvent::Start);
                                 }
                             }
                         }
@@ -110,16 +113,21 @@ impl From<Element> for StartEvent {
     }
 }
 
+#[derive(Debug)]
+enum Control {
+    Ready,
+    Done,
+}
+
 impl Stream for StartEvent {
     type Item = Action;
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         match self.state {
-            State::Initialized => Poll::Pending,
+            State::Initialized => {
+                self.wake_on_event(cx.waker().clone());
+                Poll::Pending
+            }
             State::Ready => {
-                enum Control {
-                    Ready,
-                    Done,
-                }
                 let next = self.event_receivers.iter_mut().find_map(|receiver| {
                     let res = receiver.try_recv();
                     #[allow(unreachable_patterns)]
@@ -129,7 +137,6 @@ impl Stream for StartEvent {
                         Ok(_) => None,
                         // If the channel is empty, continue trying
                         Err(broadcast::error::TryRecvError::Empty) => None,
-                        // If event broadcaster is closed, we'll never receive anything
                         Err(broadcast::error::TryRecvError::Closed) => Some(Control::Done),
                         // If event receiver has lagged, continue trying
                         Err(broadcast::error::TryRecvError::Lagged(_)) => None,
@@ -138,9 +145,7 @@ impl Stream for StartEvent {
                 match next {
                     Some(Control::Ready) => {
                         self.state = State::Complete;
-                        Poll::Ready(Some(Action::Flow(
-                            (0..self.element.outgoings().len()).collect(),
-                        )))
+                        Poll::Ready(Some(Action::Complete))
                     }
                     Some(Control::Done) => Poll::Ready(None),
                     None => {
@@ -151,7 +156,9 @@ impl Stream for StartEvent {
             }
             State::Complete => {
                 self.state = State::Done;
-                Poll::Ready(Some(Action::Complete))
+                Poll::Ready(Some(Action::Flow(
+                    (0..self.element.outgoings().len()).collect(),
+                )))
             }
             State::Done => {
                 self.wake_on_event(cx.waker().clone());

@@ -37,8 +37,8 @@ serde_json = "1.0"
 streamunordered = "^0.5.2"
 derive_more = "0.99.11"
 instant = "0.1.9"
-wasm-rs-dbg = "^0.1.2"
-wasm-rs-async-executor = { version = "^0.8.1", features = ["debug"] }
+# wasm-rs-dbg = "^0.1.2"
+# wasm-rs-async-executor = { version = "^0.8.1", features = ["debug"] }
 num-traits = "0.2.14"
 html-escape = "0.2.13"
 

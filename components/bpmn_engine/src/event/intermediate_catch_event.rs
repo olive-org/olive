@@ -1,4 +1,12 @@
 //! # Intermediate Catch Event flow node
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context, Poll, Waker};
+
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use tokio::sync::{broadcast, mpsc};
+
 use crate::bpmn::schema::{
     Cast, EventDefinitionType, FlowNodeType, IntermediateCatchEvent as Element,
 };
@@ -6,12 +14,6 @@ use crate::event::ProcessEvent;
 use crate::flow_node::{self, Action, FlowNode, IncomingIndex};
 use crate::process;
 use crate::sys::task;
-use futures::stream::Stream;
-use serde::{Deserialize, Serialize};
-use std::pin::Pin;
-use std::sync::Arc;
-use std::task::{Context, Poll, Waker};
-use tokio::sync::{broadcast, mpsc};
 
 /// Intermediate Catch Event flow node
 pub struct IntermediateCatchEvent {
@@ -162,7 +164,6 @@ impl Stream for IntermediateCatchEvent {
                                     if let Some(definition) = Cast::<dyn EventDefinitionType>::cast(
                                         event_definition.clone().into_inner().as_ref(),
                                     ) {
-                                        use std::convert::TryFrom;
                                         if let Ok(event) = ProcessEvent::try_from(definition) {
                                             if event == e {
                                                 Some(e.clone())
@@ -228,7 +229,10 @@ mod tests {
 
     #[olive_im::test]
     async fn catch_none_event() {
-        let definitions = parse(include_str!("../../../../definitions/catch_none_event.bpmn")).unwrap();
+        let definitions = parse(include_str!(
+            "../../../../definitions/catch_none_event.bpmn"
+        ))
+        .unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();
@@ -254,7 +258,10 @@ mod tests {
 
     #[olive_im::test]
     async fn catch_signal_event() {
-        let definitions = parse(include_str!("../../../../definitions/catch_signal_event.bpmn")).unwrap();
+        let definitions = parse(include_str!(
+            "../../../../definitions/catch_signal_event.bpmn"
+        ))
+        .unwrap();
         let model = model::Model::new(definitions).spawn().await;
 
         let handle = model.processes().await.unwrap().pop().unwrap();

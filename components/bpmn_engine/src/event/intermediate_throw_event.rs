@@ -1,15 +1,17 @@
 //! # Intermediate Throw Event flow node
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context, Poll, Waker};
+
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use tokio::sync::broadcast;
+
 use crate::bpmn::schema::{
     Cast, EventDefinitionType, FlowNodeType, IntermediateThrowEvent as Element,
 };
 use crate::event::ProcessEvent;
 use crate::flow_node::{self, Action, FlowNode, IncomingIndex};
-use futures::stream::Stream;
-use serde::{Deserialize, Serialize};
-use std::pin::Pin;
-use std::sync::Arc;
-use std::task::{Context, Poll, Waker};
-use tokio::sync::broadcast;
 
 /// Intermediate Throw Event flow node
 pub struct IntermediateThrowEvent {
@@ -96,7 +98,6 @@ impl Stream for IntermediateThrowEvent {
                             if let Some(definition) = Cast::<dyn EventDefinitionType>::cast(
                                 event_definition.clone().into_inner().as_ref(),
                             ) {
-                                use std::convert::TryFrom;
                                 if let Ok(event) = ProcessEvent::try_from(definition) {
                                     let _ = event_broadcaster.send(event);
                                 }

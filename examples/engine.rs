@@ -6,7 +6,7 @@ use bpmn_engine::{context, model};
 use serde_json::json;
 use tokio::{self, task};
 
-#[tokio::main]
+#[tokio::main(flavor = "multi_thread", worker_threads = 4)]
 async fn main() {
     let definitions = parse(include_str!("../definitions/task_service.bpmn")).unwrap();
     let model = model::Model::new(definitions).spawn().await;
@@ -15,6 +15,7 @@ async fn main() {
     let mut recevier = handle.log_receiver();
 
     assert!(handle.start().await.is_ok());
+    println!("1");
 
     let _ = task::spawn(async move {
         loop {

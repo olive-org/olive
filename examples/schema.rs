@@ -47,6 +47,6 @@ fn main() {
     d.set_id(Some("1".to_string()));
     d.root_elements_mut().push(RootElement::Process(process));
 
-    let out = serde_json::to_string(&d).unwrap();
-    println!("{:?}", out);
+    let out = serde_json::to_string_pretty(&d).unwrap();
+    println!("{}", out);
 }
