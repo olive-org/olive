@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+option go_package = "github.com/olive.org/olive/proto/server";
+option java_multiple_files = true;
+option java_package = "org.olive.server.olive.server";
+option java_outer_classname = "OliveProto";
+
+package server;
+
+import "api/api.proto";
+
+service ProcessDefinitionsService {
+  rpc DeployDefinitions(DeployDefinitionsRequest) returns (DeployDefinitionsResponse);
+  rpc ListDefinitions(ListDefinitionsRequest) returns (ListDefinitionsResponse);
+  rpc GetDefinitions(GetDefinitionsRequest) returns (GetDefinitionsResponse);
+  rpc DeleteDefinitions(DeleteDefinitionsRequest) returns (DeleteDefinitionsResponse);
+  rpc ExecuteDefinitions(ExecuteDefinitionsRequest) returns (ExecuteDefinitionsResponse);
+}
+
+message DeployDefinitionsRequest {
+  string name = 1;
+  string definitions = 2;
+}
+
+message DeployDefinitionsResponse { api.ProcessDefinitions definitions = 1; }
+
+message ListDefinitionsRequest {}
+
+message ListDefinitionsResponse {
+  repeated api.ProcessDefinitions definitions = 1;
+}
+
+message GetDefinitionsRequest {
+  int64 key = 1;
+  int64 processVersion = 2;
+}
+
+message GetDefinitionsResponse { api.ProcessDefinitions definitions = 1; }
+
+message DeleteDefinitionsRequest {
+  int64 key = 1;
+  int64 processVersion = 2;
+}
+
+message DeleteDefinitionsResponse {}
+
+message ExecuteDefinitionsRequest {
+  string name = 1;
+  int64 key = 2;
+  int64 processVersion = 3;
+  map<string, string> properties = 4;
+}
+
+message ExecuteDefinitionsResponse { api.ProcessInstance instance = 1; }
+
+service ProcessInstanceService {
+  rpc ListProcessInstance(ListProcessInstanceRequest) returns (ListProcessInstanceResponse);
+  rpc GetProcessInstance(GetProcessInstanceRequest) returns (GetProcessInstanceResponse);
+  rpc CancelProcessInstance(CancelProcessInstanceRequest) returns (CancelProcessInstanceResponse);
+}
+
+message ListProcessInstanceRequest {}
+
+message ListProcessInstanceResponse { repeated api.ProcessInstance instances = 1; }
+
+message GetProcessInstanceRequest { int64 key = 1; }
+
+message GetProcessInstanceResponse { api.ProcessInstance instance = 1; }
+
+message CancelProcessInstanceRequest { int64 key = 1; }
+
+message CancelProcessInstanceResponse { api.ProcessInstance instance = 1; }

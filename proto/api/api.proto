@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "github.com/olive.org/olive/proto/api";
+option java_multiple_files = true;
+option java_package = "org.olive.server.olive.api";
+option java_outer_classname = "OliveApiProto";
+
+package api;
+
+message ProcessDefinitions {
+  int64 key = 1;
+  int64 processVersion = 2;
+  string bpmnProcessId = 3;
+}
+
+message ProcessInstance { int64 key = 1; }
+
+message FlowNode { int64 key = 1; }

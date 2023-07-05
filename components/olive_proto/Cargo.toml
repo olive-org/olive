@@ -1,0 +1,17 @@
+[package]
+name = "olive_proto"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+prost = { version = "0.11" }
+tonic = { version = "0.9.2" }
+serde = { version = "1.0.119", features = ["derive"] }
+
+[build-dependencies]
+tonic-build = { version = "0.9.2", features = ["prost"] }
+
+[dev-dependencies]
+serde_json = "1.0"

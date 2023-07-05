@@ -1,0 +1,9 @@
+{
+    "protoc": {
+        "path": "/opt/homebrew/bin/protoc",
+        "compile_on_save": false,
+        "options": [
+            "--proto_path=${workspaceRoot}/proto",
+        ]
+    }
+}
