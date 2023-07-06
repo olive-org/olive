@@ -1,12 +1,12 @@
 use olive_proto::{
-    api::ProcessDefinitions, process_instance_service_server::ProcessInstanceService,
+    process_instance_service_server::ProcessInstanceService,
     server::process_definitions_service_server::ProcessDefinitionsService,
     CancelProcessInstanceRequest, CancelProcessInstanceResponse, DeleteDefinitionsRequest,
     DeleteDefinitionsResponse, DeployDefinitionsRequest, DeployDefinitionsResponse,
     ExecuteDefinitionsRequest, ExecuteDefinitionsResponse, GetDefinitionsRequest,
     GetDefinitionsResponse, GetProcessInstanceRequest, GetProcessInstanceResponse,
     ListDefinitionsRequest, ListDefinitionsResponse, ListProcessInstanceRequest,
-    ListProcessInstanceResponse, ProcessInstance,
+    ListProcessInstanceResponse, ProcessInstance, ProcessDefinitions,
 };
 use tonic::{Request, Response, Status};
 
@@ -20,6 +20,8 @@ impl ProcessDefinitionsService for OliveServer {
         request: Request<DeployDefinitionsRequest>,
     ) -> Result<Response<DeployDefinitionsResponse>, Status> {
         println!("Got a request from {:?}", request.remote_addr());
+        let req = request.into_inner();
+        let _ = req.name;
 
         let rsp = DeployDefinitionsResponse {
             definitions: Some(ProcessDefinitions::default()),

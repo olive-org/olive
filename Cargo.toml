@@ -6,6 +6,7 @@ members = [
     "components/bpmn_engine",
     "components/olive_proto",
     "components/olive_server",
+    "components/storage",
 
     # internal member
     "examples",
@@ -17,3 +18,4 @@ bpmn_schema = { path = "components/bpmn_schema" }
 bpmn_engine = { path = "components/bpmn_engine" }
 olive_proto = { path = "components/olive_proto" }
 olive_server = { path = "components/olive_server" }
+storage = { path = "components/storage" }
