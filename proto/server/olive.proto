@@ -32,14 +32,14 @@ message ListDefinitionsResponse {
 
 message GetDefinitionsRequest {
   int64 key = 1;
-  int64 processVersion = 2;
+  int64 process_version = 2;
 }
 
 message GetDefinitionsResponse { api.ProcessDefinitions definitions = 1; }
 
 message DeleteDefinitionsRequest {
   int64 key = 1;
-  int64 processVersion = 2;
+  int64 process_version = 2;
 }
 
 message DeleteDefinitionsResponse {}
@@ -47,7 +47,7 @@ message DeleteDefinitionsResponse {}
 message ExecuteDefinitionsRequest {
   string name = 1;
   int64 key = 2;
-  int64 processVersion = 3;
+  int64 process_version = 3;
   map<string, string> properties = 4;
 }
 

@@ -9,10 +9,18 @@ package api;
 
 message ProcessDefinitions {
   int64 key = 1;
-  int64 processVersion = 2;
-  string bpmnProcessId = 3;
+  int64 process_version = 2;
+  string process_id = 3;
+  string definitions = 4;
+  int64 creation_timestamp = 5;
 }
 
-message ProcessInstance { int64 key = 1; }
+message ProcessInstance { 
+  int64 key = 1;
+  int64 process_version = 2;
+  string process_id = 3;
+  int64 start_timestamp = 4;
+  int64 end_timestamp = 5;
+}
 
 message FlowNode { int64 key = 1; }

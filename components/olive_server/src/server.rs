@@ -11,7 +11,9 @@ use olive_proto::{
 use tonic::{Request, Response, Status};
 
 #[derive(Debug)]
-pub struct OliveServer {}
+pub struct OliveServer {
+    
+}
 
 #[tonic::async_trait]
 impl ProcessDefinitionsService for OliveServer {
